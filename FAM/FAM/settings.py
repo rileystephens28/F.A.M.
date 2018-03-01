@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'cryptocurrencies',
     'stocks',
     'options',
+    'FAM',
 ]
 
 MIDDLEWARE = [
@@ -83,6 +84,9 @@ DATABASES = {
         'NAME': 'FAM',
 	    'USER': 'root',
 	    'PASSWORD': 'Reed1rile2',
+        'OPTIONS': {
+           "init_command": "SET GLOBAL max_connections = 100000",
+        }
     }
 }
 
