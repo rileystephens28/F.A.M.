@@ -1,0 +1,248 @@
+<!doctype html>
+
+<html class="no-js" lang="en">
+
+  <head>
+
+    <meta charset="utf-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Smart Asset Tracking </title>
+
+    <link rel="stylesheet" 
+
+      href="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.min.css">
+
+    <link rel="stylesheet" href="main.css">
+
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    
+
+    <!-- Start Top Bar -->
+
+	  
+
+    <div class="top-bar">
+
+      <div class="top-bar-left">
+
+        <h1 style="align:center;">F.A.M.</li>
+
+      </div>
+
+      <div class="top-bar-right">
+
+        <ul class="menu">
+
+          <a style="align:right" href="#" class="button">Sign Up</a>
+
+          <a style="align:right" href="#" class="button">Login</a>
+
+        </ul>
+
+      </div>
+
+    </div>
+
+    <!-- End Top Bar -->
+
+
+
+
+    <div class="callout large scrum">
+
+      <div class="row column text-center bottom">
+
+        <h1 class="scrum_h1 bottom">Financial asset management done the right way...do yourself a favor and join the F.A.M.</h1>
+
+      </div>
+
+    </div>
+
+    
+
+    <div class="row">
+
+      <div class="medium-6 columns medium-push-6">
+
+        <img class="thumbnail pm_image" 
+
+          src="https://www.roberthalf.com/sites/default/files/styles/full_width_content_image_1x_small_480/public/Media_Root/images/blog-mr/senior-business-systems-analyst-blog-rhmr-02-04-16_0.jpg?itok=htTz70Pf">
+
+      </div>
+
+      <div class="medium-6 columns medium-pull-6">
+
+        <h2>Smart Asset Management</h2>
+
+        <p>
+
+          F.A.M. stands for Financial Asset Management. We allow you to track your financial 
+
+          investments across mutliple different markets. Our platform will track anything
+
+          from stocks, to options, even cyrpotcurrencies!
+
+        </p>
+
+      </div>
+
+    </div>
+
+
+
+
+    <div class="row">
+
+      <div class="medium-4 columns">
+
+        <br></br>
+
+        <h3>What Do We Track?</h3>
+
+        <p>
+
+          The F.A.M.platform tracks investments accross many different markets. 
+
+          We currently support all stocks on the United States Stock Exchange, all options on the Chicago Board of Options Exchange,
+
+          and cryptocurrencies on Coinbase, Gemini, Poloniex, Kraken, Cex.io, Binance, and HitBTC. We strive to be a fully intigrated asset management solution for our members.
+
+        </p>
+
+      </div>
+
+      <div class="medium-4 columns">
+
+        <br></br>
+
+        <h3>Why Should You Care?</h3>
+
+        <p>
+
+          Because we track assets across the most desirable investment markets, we can track the performance of
+
+          virtually all of your investsments over time. We provide the convenience of full portfolio management with real time market data.
+
+        </p>
+
+      </div>
+
+      <div class="medium-4 columns">
+
+        <br></br>
+
+        <h3>Can't Find Your Asset?</h3>
+
+        <p>
+
+          If for some strange reason we don't provide tracking capability on one of your investments, just let us know! We will
+
+          get right with our development team to organize the addition of your asset to our platform! You can reach out to us by clicking the 
+
+          "Contact Us" button at the top of the page.
+
+        </p>
+
+      </div>
+
+    </div>
+
+
+
+
+    <hr>
+
+
+
+
+    <div class="row column">
+
+      <ul class="vertical medium-horizontal menu expanded text-center">
+
+        <li>
+
+          <a href="#"><div class="stat">2500+</div><span>Assets Tracked</span></a>
+
+        </li>
+
+        <li>
+
+          <a href="#"><div class="stat">200+</div><span>Portfolios Managed</span></a>
+
+        </li>
+
+        <li>
+
+          <a href="#"><div class="stat">$476,000</div><span>Total Porfolio Value</span></a>
+
+        </li>
+
+      </ul>
+
+    </div>
+
+
+
+
+    <hr>
+
+
+
+
+    <div class="row column">
+
+      <h3>Learn More</h3>
+
+    </div>
+
+
+
+
+    <div class="row medium-up-3 ">
+
+      <div class="column">
+
+        <br></br>
+
+        <img class="thumbnail" 
+
+          src="https://standardoracle.com/wp-content/uploads/2017/02/stocks-1.jpg">
+
+      </div>
+
+      <div class="column">
+
+        <br></br>
+
+        <img class="thumbnail" 
+
+          src="http://stockoptionspick.net/wp-content/uploads/2017/01/cropped-stock-options-pick.jpg">
+
+      </div>
+
+      <div class="column">
+
+        <br></br>
+
+        <img class="thumbnail" 
+
+          src="https://d1btnptfa0r0eu.cloudfront.net/wp-content/uploads/2017/08/170816-bitcoin-b-634x357.jpg">
+
+      </div>
+
+    </div>
+
+    <hr>
+
+    <hr>
+
+	</body>
+
+</html>
