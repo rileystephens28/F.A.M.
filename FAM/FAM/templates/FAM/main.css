@@ -12,6 +12,24 @@ body{
   background-color: #50424b;
 }
 
+.top-bar {
+  background-color: #b12737;
+  height: 85px;
+  position: fixed;
+  width: 100%;
+  z-index: 10;
+
+}
+
+.top-bar-left {
+  padding-left: 20px;
+}
+
+.top-bar-right{
+  position: relative;
+  display: inline-block;
+}
+
 ul{
   text-decoration: none;
   display: block;
@@ -20,10 +38,11 @@ ul{
 
 ul li{
   float: left;
-  padding-left: 15px;
+  /* padding-left: 15px; */
+  padding-right: 25px;
   text-align: center;
   text-decoration: none;
-  text-transform: uppercase;
+
 
 }
 
@@ -32,32 +51,55 @@ ul li a{
   text-decoration: none;
   color: #e3c080;
   font-size: 20px;
-  font-family: Impact, Charcoal, sans-serif;
-
+  font-family: "Verdana", Geneva, sans-serif;
 }
 
-ul li ul li{
-  display: none;
+ul li a:hover{
+  color: white;
 }
 
-.top-bar-left {
-  padding-left: 20px;
+ul li:hover .dropdown-content{
+  display: block;
+  text-align: center;
 }
 
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    min-width: 100px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    right: 0;
+    margin-right: -2%;
+    padding-top: 5px;
+}
+
+.dropdown-content a:hover {
+  background-color: black;
+  color: #e3c080;
+}
 
 .sign-up{
-  text-align: center;
-  padding-left: 25%;
-  padding-right: 25%;
+  /* height: 50px;
+  width: 300px; */
   padding-top: 25%;
-  font-size: 50px;
-}
-
-.top-bar {
-  background-color: #b12737;
-  height: 85px;
+  background-color: none;
+  text-align: center;
+  bottom: 10px;
+  display: block;
 
 }
+
+.sign-up ul li a {
+  color: black;
+}
+
+.content{
+  position: relative;
+  margin-top: 85px;
+}
+
 
 .pm_image {
 
@@ -66,6 +108,10 @@ ul li ul li{
 }
 
 .scrum {
+
+  top: 85px;
+
+  width: 100%;
 
   background-image:   url("joinedit.png");
 
@@ -102,9 +148,7 @@ ul li ul li{
 }
 
 
-.medium-4{
-  color: #9dbca6;
-}
+
 
 nav {
 
