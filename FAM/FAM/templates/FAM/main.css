@@ -1,0 +1,215 @@
+.agilephd {
+
+  font-family: 'Montserrat', sans-serif;
+
+  font-size: 2.5rem;
+
+  text-align: center;
+
+}
+
+body{
+  background-color: #50424b;
+}
+
+ul{
+  text-decoration: none;
+  display: block;
+  list-style: none;
+}
+
+ul li{
+  float: left;
+  padding-left: 15px;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+
+}
+
+ul li a{
+  display: block;
+  text-decoration: none;
+  color: #e3c080;
+  font-size: 20px;
+  font-family: Impact, Charcoal, sans-serif;
+
+}
+
+ul li ul li{
+  display: none;
+}
+
+.top-bar-left {
+  padding-left: 20px;
+}
+
+
+.sign-up{
+  text-align: center;
+  padding-left: 25%;
+  padding-right: 25%;
+  padding-top: 25%;
+  font-size: 50px;
+}
+
+.top-bar {
+  background-color: #b12737;
+  height: 85px;
+
+}
+
+.pm_image {
+
+  max-width: 75%;
+
+}
+
+.scrum {
+
+  background-image:   url("joinedit.png");
+
+  background-size: 1540PX 500PX;
+
+  background-repeat:  no-repeat;
+
+  background-size: cover;
+
+  background-position: center;
+  /* background-color:   #D8D8D8; */
+
+  /* color:              #A9A9A9; */
+
+   min-height:         500px;
+  /* min-width:           600px; */
+
+/*  opacity:            .5;*/
+
+}
+
+
+
+.scrum_h1 {
+
+/*  background-color:   #D3D3D3;*/
+
+  color:              #b12737;
+
+  /* text-shadow:        -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black; */
+
+/*  opacity:            1;*/
+
+}
+
+
+.medium-4{
+  color: #9dbca6;
+}
+
+nav {
+
+  /* background-color: blue; */
+
+  background-image: -webkit-gradient(linear, left top, left bottom, from(rgb(76, 162, 232)), to(rgb(35, 113, 183)));
+
+	background-image: -webkit-linear-gradient(top, rgb(76, 162, 232), rgb(35, 113, 183));
+
+	background-image: -moz-linear-gradient(top, rgb(76, 162, 232), rgb(35, 113, 183));
+
+	background-image: -o-linear-gradient(top, rgb(76, 162, 232), rgb(35, 113, 183));
+
+	background-image: -ms-linear-gradient(top, rgb(76, 162, 232), rgb(35, 113, 183));
+
+	background-image: linear-gradient(top, rgb(76, 162, 232), rgb(35, 113, 183));
+
+	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,StartColorStr='#4ca2e8', EndColorStr='#2371b7');
+
+  padding-left: 200px;
+
+}
+
+
+
+
+
+
+ /** Button Style **/
+
+.button {
+
+  /** Font Style **/
+
+   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+
+  text-transform:uppercase;
+
+  font-size:14px;
+
+	color:#fff;
+
+  text-decoration:none;
+
+	font-weight:bold;
+
+	text-transform:uppercase;
+
+	text-shadow:rgba(0, 0, 0, 0.30) 0 -1.25px 0;
+
+
+
+  /** Button Style **/
+
+  display:-moz-inline-stack;
+
+  -webkit-font-smoothing:antialiased;
+
+	display:inline-block;
+
+	vertical-align:middle;
+
+	vertical-align:auto;
+
+	zoom:1;
+
+  margin-top: 10px;
+
+  margin-bottom: 10px;
+
+	border:1px solid #13619f;
+
+	background: #2371b7;
+
+	padding:11px 20px;
+
+	-webkit-border-radius:3px;
+
+	-moz-border-radius:3px;
+
+	-ms-border-radius:3px;
+
+	-o-border-radius:3px;
+
+	border-radius:3px;
+
+	-webkit-box-shadow:rgba(255, 255, 255, 0.3) 0 1px 0, inset rgba(255, 255, 255, 0.3) 0 1px 0;
+
+	-moz-box-shadow:rgba(255, 255, 255, 0.3) 0 1px 0, inset rgba(255, 255, 255, 0.3) 0 1px 0;
+
+	box-shadow:rgba(255, 255, 255, 0.3) 0 1px 0, inset rgba(255, 255, 255, 0.3) 0 1px 0;
+
+}
+
+
+
+
+/** Active State Style **/
+
+.button:active {
+
+	border-color:#083559;
+
+	-webkit-box-shadow:rgba(255, 255, 255, 0.2) 0 1px 0, inset rgba(0, 0, 0, 0.25) 0 1px 4px;
+
+	-moz-box-shadow:rgba(255, 255, 255, 0.2) 0 1px 0, inset rgba(0, 0, 0, 0.25) 0 1px 4px;
+
+	box-shadow:rgba(255, 255, 255, 0.2) 0 1px 0, inset rgba(0, 0, 0, 0.25) 0 1px 4px;
