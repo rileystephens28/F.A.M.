@@ -1,7 +1,9 @@
 import sys
-sys.path.insert(0, "/home/riley_stephens/Django/FAM/FAM")
 import os
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "FAM.settings")
+dir_path = str(os.path.dirname(os.path.realpath(__file__)))
+dir_path = dir_path[:-7]
+sys.path.insert(0, dir_path)
+os.environ['DJANGO_SETTINGS_MODULE'] = 'FAM.settings'
 import django
 django.setup()
 from sources.models import StockExchange, OptionExchange, CryptoExchange

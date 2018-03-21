@@ -1,0 +1,59 @@
+{% extends 'FAM/base.html' %}
+
+{% block content %}
+</br>
+</br>
+
+<form class = "site-form" action = "{% url 'browse_asset' %}" method="post">
+  <input type="text" name="q" placeholder="Search stocks and cryptocurrencies..." id="id_q" value="{{ query }}"/>
+  {% csrf_token %}
+  <input type="submit" value="Search" />
+</form>
+{% if asset != None %}
+  {% if type == "crypto" %}
+
+    <div class = "menu">
+      <ul>
+        <li><a>Symbol: {{ asset.symbol }}</a></li>
+        <li> <a>Bid: {{ asset.bid }}</a> </li>
+        <li><a>Ask: {{ asset.ask }}</a> </li>
+        <li> <a>Last: {{ asset.last }}</a></li>
+        <li> <a>Base Volume: {{ asset.base_volume }}</a> </li>
+        <li> <a>Quote Volume: {{ asset.quote_volume }}</a> </li>
+      </ul>
+    </div>
+  {% else %}
+
+    <div class = "menu">
+      <ul>
+        <li><a>Symbol: {{ asset.symbol }}</a></li>
+        <li> <a>Bid: {{ asset.bid }}</a> </li>
+        <li><a>Ask: {{ asset.ask }}</a> </li>
+        <li> <a>Last: {{ asset.last }}</a></li>
+        <li> <a>Volume: {{ asset.volume }}</a> </li>
+        <li> <a>High: {{ asset.high }}</a></li>
+        <li> <a>Low: {{ asset.low }}</a></li>
+        <li> <a>Open: {{ asset.open_price }}</a></li>
+        <li> <a>Close: {{ asset.close_price }}</a></li>
+      </ul>
+    </div>
+
+  {% endif %}
+
+  <form method="post" action = "{% url 'add_asset' %}">
+    {% csrf_token %}
+    <button
+      name = "q"
+      type="submit"
+      class="button"
+      value= "{{ asset.symbol }}"
+      name="add">Add Asset
+
+    </button>
+   </form>
+
+{% endif %}
+
+
+
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'FAM/base.html' %}
+
+{% block content %}
+<br>
+</br>
+<br>
+</br>
+<h1 align="center">Login</h1>
+<form class = "site-form" action = "{% url 'login'%}" method="post">
+  {% csrf_token %}
+  {{ form }}
+  <input type="submit" value = "Login"</>
+</form>
+
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends 'FAM/base.html' %}
+
+{% block content %}
+<br>
+</br>
+<br>
+</br>
+{% if assets %}
+  {% for asset in assets %}
+    <div class = "menu">
+      <ul>
+        <li><a>Symbol: {{ asset.symbol }}</a></li>
+        <li> <a>Bid: {{ asset.bid }}</a> </li>
+        <li><a>Ask: {{ asset.ask }}</a> </li>
+        <li> <a>Last: {{ asset.last }}</a></li>
+      </ul>
+    </div>
+    <form method="post" action = "{% url 'delete_asset' %}">
+      {% csrf_token %}
+      <button
+        name = "q"
+        type="submit"
+        class="button"
+        value= "{{ asset.symbol }}"
+        name="delete">Remove Asset
+      </button>
+     </form>
+  </br>
+  {% endfor %}
+{% else %}
+  <h3>You are not tracking any assets.</h3>
+{% endif %}
+
+{% endblock %}
