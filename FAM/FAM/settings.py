@@ -79,12 +79,9 @@ WSGI_APPLICATION = 'FAM.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'FAM',
-	    'USER': 'root',
-	    'PASSWORD': 'Reed1rile2',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         'OPTIONS': {
-           "init_command": "SET GLOBAL max_connections = 100000",
         }
     }
 }
