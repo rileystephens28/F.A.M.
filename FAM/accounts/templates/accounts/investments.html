@@ -9,7 +9,7 @@
   {% for asset in assets %}
     <div class = "menu">
       <ul>
-        <li><a>Symbol: {{ asset.symbol }}</a></li>
+        <li><a href={% url 'performance' asset.symbol %}>Symbol: {{ asset.symbol }}</a></li>
         <li> <a>Bid: {{ asset.bid }}</a> </li>
         <li><a>Ask: {{ asset.ask }}</a> </li>
         <li> <a>Last: {{ asset.last }}</a></li>

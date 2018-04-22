@@ -23,7 +23,6 @@ for pairs in data:
         pair.symbol = pair.base + pair.quote
         pair.exchange = exchange
         pair.save()
-
 s = requests.Session()
 s.headers.update({'Authorization':'Bearer ' + 'XCp8C02gIfnzIW99aTTU4jnPQGVJ', 'Accept':'application/json'})
 url = 'https://api.tradier.com/v1/markets/lookup'

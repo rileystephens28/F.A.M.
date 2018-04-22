@@ -9,34 +9,84 @@
   {% csrf_token %}
   <input type="submit" value="Search" />
 </form>
+</br>
 {% if asset != None %}
+  <div style="height:300;
+              display: block;
+              margin-left: auto;
+              margin-right: auto;
+              width: 50%;">
+    {{ graph|safe }}
+    </br>
   {% if type == "crypto" %}
 
-    <div class = "menu">
-      <ul>
-        <li><a>Symbol: {{ asset.symbol }}</a></li>
-        <li> <a>Bid: {{ asset.bid }}</a> </li>
-        <li><a>Ask: {{ asset.ask }}</a> </li>
-        <li> <a>Last: {{ asset.last }}</a></li>
-        <li> <a>Base Volume: {{ asset.base_volume }}</a> </li>
-        <li> <a>Quote Volume: {{ asset.quote_volume }}</a> </li>
-      </ul>
-    </div>
+  <table>
+    <tr>
+      <th>{{ asset.symbol }}</th>
+    </tr>
+    <tr>
+      <td>Bid</td>
+      <td>{{ asset.bid }}</td>
+    </tr>
+    <tr>
+      <td>Ask</td>
+      <td>{{ asset.ask }}</td>
+    </tr>
+    <tr>
+      <td>Last</td>
+      <td>{{ asset.last }}</td>
+    </tr>
+    <tr>
+      <td>Base Volume</td>
+      <td>{{ asset.base_volume }}</td>
+    </tr>
+    <tr>
+      <td>quote_volume</td>
+      <td>{{ asset.quote_volume }}</td>
+    </tr>
+    <tr>
+  </table>
+
   {% else %}
 
-    <div class = "menu">
-      <ul>
-        <li><a>Symbol: {{ asset.symbol }}</a></li>
-        <li> <a>Bid: {{ asset.bid }}</a> </li>
-        <li><a>Ask: {{ asset.ask }}</a> </li>
-        <li> <a>Last: {{ asset.last }}</a></li>
-        <li> <a>Volume: {{ asset.volume }}</a> </li>
-        <li> <a>High: {{ asset.high }}</a></li>
-        <li> <a>Low: {{ asset.low }}</a></li>
-        <li> <a>Open: {{ asset.open_price }}</a></li>
-        <li> <a>Close: {{ asset.close_price }}</a></li>
-      </ul>
-    </div>
+  <table style="width:30%">
+    <tr>
+      <th>{{ asset.symbol }}</th>
+    </tr>
+    <tr>
+      <td>Bid</td>
+      <td>{{ asset.bid }}</td>
+    </tr>
+    <tr>
+      <td>Ask</td>
+      <td>{{ asset.ask }}</td>
+    </tr>
+    <tr>
+      <td>Last</td>
+      <td>{{ asset.last }}</td>
+    </tr>
+    <tr>
+      <td>Volume</td>
+      <td>{{ asset.volume }}</td>
+    </tr>
+    <tr>
+    <tr>
+      <td>High</td>
+      <td>{{ asset.high }}</td>
+    </tr>
+    <tr>
+      <td>Low</td>
+      <td>{{ asset.low }}</td>
+    </tr>
+    <tr>
+      <td>Open</td>
+      <td>{{ asset.open_price }}</td>
+    </tr>
+    <tr>
+      <td>Close</td>
+      <td>{{ asset.close_price }}</td>
+    </tr>
+  </table>
 
   {% endif %}
 
@@ -51,8 +101,10 @@
 
     </button>
    </form>
+   </div>
 
 {% endif %}
+
 
 
 
