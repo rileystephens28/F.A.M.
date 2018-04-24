@@ -21,6 +21,7 @@ def check_value(value):
 
 tradier = Tradier()
 stocks = tradier.get_all_tickers()
+print(len(stocks))
 saved = list([item.symbol for item in Stock.objects.all()])
 for stock in stocks:
     if stock["symbol"] not in saved:
