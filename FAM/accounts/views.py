@@ -1,3 +1,6 @@
+import datetime
+import plotly.offline as opy
+import plotly.graph_objs as go
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib.auth.models import User
@@ -5,28 +8,26 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
 import django
 from assets.models import Stock, Option, Cryptocurrency
-from .models import StockInvestment, OptionInvestment, CryptoInvestment
-import datetime
-import plotly.offline as opy
-import plotly.graph_objs as go
-
-
-
-
+from .models import StockInvestment, OptionInvestment, CryptoInvestment, Account
+from accounts.forms import SignUpForm, AddInvestment
 
 def signup_view(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = SignUpForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect('home')
-        else:
-            form = UserCreationForm()
+            if not Account.objects.filter(user=request.user):
+                account = Account()
+                user = form.save()
+                account.user = user
+                account.name = form.cleaned_data.get('first_name') + ' ' + form.cleaned_data.get('last_name')
+                account.save()
+                login(request, user)
+                return redirect('home')
+            else:
+                return redirect('login')
     else:
-        form = UserCreationForm()
-    return render(request, 'accounts/signup.html', {'form': form})
-
+        form = SignUpForm()
+    return render(request, 'signup.html', {'form': form})
 
 def login_view(request):
     if request.method == "POST":
@@ -45,25 +46,30 @@ def login_view(request):
 @login_required(login_url="/account/login/")
 def add_asset(request):
     if request.method == 'POST':
+        form = AddInvestment(data = request.POST)
         asset = request.POST.get("q")
         user = request.user
         if Cryptocurrency.objects.filter(symbol = asset.upper()):
-            if not CryptoInvestment.objects.filter(asset=Cryptocurrency.objects.get(symbol=asset.upper()),investor=User.objects.get(username=user.get_username())):
-                investment = CryptoInvestment()
-                investment.investor = User.objects.get(username = user.get_username())
-                investment.asset = Cryptocurrency.objects.get(symbol = request.POST.get("q"))
-                investment.purchase_price = (investment.asset.bid + investment.asset.ask)/2
-                investment.purchase_date = django.utils.timezone.now
-                investment.save()
+            investment = CryptoInvestment()
+            investment.asset = Cryptocurrency.objects.get(symbol = asset)
         elif Stock.objects.filter(symbol = asset.upper()):
-            if not StockInvestment.objects.filter(asset=Stock.objects.get(symbol=asset.upper()),investor=User.objects.get(username=user.get_username())):
-                investment = StockInvestment()
-                investment.investor = User.objects.get(username = user.get_username())
-                investment.asset = Stock.objects.get(symbol = request.POST.get("q"))
-                investment.purchase_price = (investment.asset.bid + investment.asset.ask)/2
-                investment.purchase_date = django.utils.timezone.now
-                investment.save()
+            investment = StockInvestment()
+            investment.asset = Stock.objects.get(symbol = asset)
+        elif Option.objects.filter(symbol = asset.upper()):
+            investment = OptionInvestment()
+            investment.asset = Option.objects.get(symbol = asset)
+        investment.investor = User.objects.get(username = user.get_username())
+        if form.cleaned_data.get('purchase_price'):
+            investment.purchase_price = form.cleaned_data.get('purchase_price')
+        investment.purchase_price = form.cleaned_data.get('purchase_price')
+        investment.quantity = form.cleaned_data.get('quantity')
+        investment.purchase_date = django.utils.timezone.now
+        investment.save()
+
         return redirect('investments')
+    else:
+        form = AddInvestment()
+    return render(request, 'accounts/login.html', {'form': form})
 
 
 @login_required(login_url="/account/login/")
@@ -79,22 +85,31 @@ def delete_asset(request):
             if StockInvestment.objects.filter(asset=Stock.objects.get(symbol=asset.upper()),investor=User.objects.get(username=user.get_username())):
                 investment = StockInvestment.objects.get(asset=Stock.objects.get(symbol=asset.upper()),investor=User.objects.get(username=user.get_username()))
                 investment.delete()
+        elif Option.objects.filter(symbol = asset.upper()):
+            if OptionInvestment.objects.filter(asset=Option.objects.get(symbol=asset.upper()),investor=User.objects.get(username=user.get_username())):
+                investment = StockInvestment.objects.get(asset=Option.objects.get(symbol=asset.upper()),investor=User.objects.get(username=user.get_username()))
+                investment.delete()
         return redirect('investments')
 
 @login_required(login_url="/account/login/")
 def investment_view(request):
     assets = []
     user_obj = request.user
-    user = User.objects.get(username = user_obj.get_username())
-    if StockInvestment.objects.filter(investor = user):
-        for stock in StockInvestment.objects.filter(investor = user):
-            assets.append(stock.asset)
+    user = User.objects.get(username=user_obj.get_username())
+    account = Account.objects.get(user=user)
+    all_investments = account.get_all_investments()
+    for data in investment.asset.get_month_chart():
+        prices.append(data["price"])
+        dates.append(data["time"])
 
-    if CryptoInvestment.objects.filter(investor = user):
-        for crypto in CryptoInvestment.objects.filter(investor = user):
-            assets.append(crypto.asset)
-    print(assets)
-    return render(request, 'accounts/investments.html', {"assets":assets})
+    trace = go.Scatter(x = dates, y = prices)
+
+    data=go.Data([trace])
+    layout=go.Layout(title="Investment performance", xaxis={'title':'Date'}, yaxis={'title':'$'})
+    figure=go.Figure(data=data,layout=layout)
+    graph = opy.plot(figure, auto_open=False, output_type='div')
+
+    return render(request, 'accounts/investments.html', {"assets":assets,"investments":all_investments})
 
 @login_required(login_url="/account/login/")
 def performance_view(request,symbol):
