@@ -1,62 +1,108 @@
 <!doctype html>
 {% load staticfiles %}
+
 <html class="no-js" lang="en">
+<!--<![endif]-->
 
   <head>
 
-    <meta charset="utf-8" />
+      <!--- basic page needs
+     ================================================== -->
+      <meta charset="utf-8">
+      <title>Financial Asset Manager</title>
+      <meta name="description" content="">
+      <meta name="author" content="">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <!-- mobile specific metas
+     ================================================== -->
+      <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Smart Asset Tracking </title>
+      <!-- CSS
+     ================================================== -->
+      <link rel="stylesheet" href= {% static "FAM/css/base.css" %}>
+      <link rel="stylesheet" href= {% static "FAM/css/vendor.css" %}>
+      <link rel="stylesheet" href= {% static "FAM/css/main.css" %}>
 
-    <link rel="stylesheet"
+      <!-- script
+     ================================================== -->
+      <script src= {% static "FAM/js/modernizr.js" %}></script>
+      <script src= {% static "FAM/js/pace.min.js" %}></script>
 
-      href="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.min.css">
-
-    <link rel="stylesheet" href={% static 'FAM/main.css' %}>
-
-    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+      <!-- famicons
+  	================================================== -->
+      <link rel="shortcut icon" href= {% static "FAM/famicon.ico" %} type={% static "FAM/image/x-icon" %}>
+      <link rel="icon" href= {% static "FAM/famicon.ico" %} type= {% static "FAM/image/x-icon" %}>
 
   </head>
 
-  <body>
+  <body id="top">
 
-    <!-- Start Top Bar -->
+      <!-- header
+     ================================================== -->
+     <header id="header" class="row">
 
-    <div class="top-bar">
+     		<div class="header-logo">
+  	        <a href= {% url "home" %}>FAM</a>
+  	    </div>
 
-      <div class="top-bar-left">
+  	   	<nav id="header-nav-wrap">
+  			<ul class="header-main-nav">
+  				<li class="current"><a class="smoothscroll"  href={% url "home" %} title="home">Home</a></li>
+                  <li><a class="smoothscroll"  href="#about" title="About">About</a></li>
 
-        <h1 style="align:center;"><a href= {% url 'home' %}><img src={% static 'FAM/Logo.png' %} height="74px" width="74px"> </a></li>
+  				<li><a class="smoothscroll"  href="#testimonials" title="trending">Trending</a></li>
+  				<li><a href= {% url "browse_asset" %} >Browse</a></li>
+  			</ul>
 
-      </div>
+              <!-- <a href="signup.html" title="sign-up" class="button button-primary cta">Sign In</a> -->
 
-      <div class = "top-bar-right">
+              <a href= {% url "signup" %} class="button button-primary cta">Sign Up</a>
+              <a href= {% url "login" %} class="button button-primary cta">Login</a>
+              <div class="dropdown-content"></div>
+  		</nav>
 
-        <div class = "menu">
-          <ul>
+  		<a class="header-menu-toggle" href="#"><span>Menu</span></a>
 
-            <li><a href= {% url 'investments' %} >Investments</a></li>
-            <li> <a>Trending</a> </li>
-            <li><a href= {% url 'browse_asset' %} >Browse</a> </li>
-            <li> <a>About Us</a></li>
-            <li> <a>Support</a> </li>
-            <li><a}><img src={% static 'FAM/glass.png' %} height="30px" width="30px"></a></li>
-            <li> <a><img src={% static 'FAM/user.png' %} height="30px" width="30px"></a>
-              <div class= "dropdown-content">
-                <a href= {% url 'login' %} > Login </a>
-                <a href= {% url 'signup' %} > Sign Up </a>
-             </div>
+     </header> <!-- /header -->
 
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-      <div>
-        {% block content %}
-        {% endblock %}
-      </div>
-    </body>
+     <div>
+     {% block content %}
+     {% endblock %}
+     </div>
+
+     <footer>
+
+       <div class="footer-bottom">
+
+         <div class="row">
+
+           <div class="col-twelve">
+             <div class="copyright">
+               <span>© Copyright FAM 2018.</span>
+               <!-- <span>Design by <a href="http://www.styleshout.com/"></a></span> -->
+              </div>
+
+              <div id="go-top">
+                 <a class="smoothscroll" title="Back to Top" href="#top"><i class="icon-arrow-up"></i></a>
+              </div>
+           </div>
+
+         </div> <!-- end footer-bottom -->
+
+       </div>
+
+     </footer>
+
+     <div id="preloader">
+       <div id="loader"></div>
+     </div>
+
+     <!-- Java Script
+     ================================================== -->
+     <script src={% static "FAM/js/jquery-2.1.3.min.js" %}></script>
+     <script src={% static "FAM/js/plugins.js" %}></script>
+     <script src={% static "FAM/js/main.js" %}></script>
+
+  </body>
+
 </html>
