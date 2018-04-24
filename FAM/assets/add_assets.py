@@ -11,36 +11,46 @@ import django
 django.setup()
 from sources.models import CryptoExchange, StockExchange
 from assets.models import Stock, Option, Cryptocurrency
+from assets.update_data.hitbtc import HitBTC
+from assets.update_data.tradier import Tradier
 
-data = requests.get('https://api.hitbtc.com/api/2/public/symbol').json()
-currency_pairs = []
-exchange = CryptoExchange.objects.get(name="HitBTC")
-for pairs in data:
-    if not Cryptocurrency.objects.filter(symbol=pairs['baseCurrency']+pairs['quoteCurrency'],exchange=exchange):
-        pair = Cryptocurrency()
-        pair.base = pairs["baseCurrency"]
-        pair.quote = pairs["quoteCurrency"]
-        pair.symbol = pair.base + pair.quote
-        pair.exchange = exchange
-        pair.save()
-s = requests.Session()
-s.headers.update({'Authorization':'Bearer ' + 'XCp8C02gIfnzIW99aTTU4jnPQGVJ', 'Accept':'application/json'})
-url = 'https://api.tradier.com/v1/markets/lookup'
-params = {'types':'stock,etf,index','linebreak':'true'}
-r = s.get(url, params=params)
-content = json.loads(r.text)
-stocks = Stock.objects.all()
-stocks = [item.symbol for item in stocks]
-stocks = stocks[:8000]
-for stock in content["securities"]["security"]:
-    if stock["symbol"] not in stocks:
+def check_value(value):
+    if value:
+        return value
+    return 0
+
+tradier = Tradier()
+stocks = tradier.get_all_tickers()
+saved = list([item.symbol for item in Stock.objects.all()])
+for stock in stocks:
+    if stock["symbol"] not in saved:
         new_stock = Stock()
         new_stock.symbol = stock["symbol"]
-        new_stock.company = stock["description"]
-        if StockExchange.objects.filter(code=stock["exchange"]):
-            new_stock.exchange = StockExchange.objects.get(code=stock["exchange"])
-            new_stock.bid = 0
-            new_stock.ask = 0
-            new_stock.last = 0
-            new_stock.price = 0
-            new_stock.save()
+        new_stock.exchange = StockExchange.objects.get(code=stock["exch"])
+        new_stock.bid = check_value(stock["bid"])
+        new_stock.ask = check_value(stock["ask"])
+        new_stock.last = check_value(stock["last"])
+        new_stock.volume = check_value(stock["volume"])
+        new_stock.high = check_value(stock["high"])
+        new_stock.low = check_value(stock["low"])
+        new_stock.open_price = check_value(stock["open"])
+        new_stock.close_price = check_value(stock["close"])
+        new_stock.save()
+
+hitbtc = HitBTC()
+cryptos = hitbtc.get_all_tickers()
+saved = list([item.symbol for item in Cryptocurrency.objects.all()])
+exchange = CryptoExchange.objects.get(name="HitBTC")
+for crypto in cryptos:
+    if crypto["symbol"] not in saved:
+        new_crypto = Cryptocurrency()
+        new_crypto.symbol = crypto["symbol"]
+        new_crypto.exchange = exchange
+        new_crypto.bid = check_value(crypto["bid"])
+        new_crypto.ask = check_value(crypto["ask"])
+        new_crypto.last = check_value(crypto["last"])
+        new_crypto.high =  check_value(crypto["high"])
+        new_crypto.low =  check_value(crypto["low"])
+        new_crypto.base_volume = check_value(crypto["volume"])
+        new_crypto.quote_volume = check_value(crypto["volumeQuote"])
+        new_crypto.save()
