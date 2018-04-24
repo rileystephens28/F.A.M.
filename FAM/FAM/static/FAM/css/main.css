@@ -1939,20 +1939,20 @@ html[data-useragent*='MSIE 10.0'] .home-scrolldown,
 
 #oil {
   background: #ffffff;
-  padding-top: 8rem;
+  padding-bottom: 8rem;
   overflow: hidden;
 }
 
 #metals {
   background: #ffffff;
-  padding-top: 8rem;
+  padding-bottom: 8rem;
   overflow: hidden;
 }
 
 #Crypto-Currency {
     /* min-height: 786px; */
     background: #ffffff;
-    padding-top: 8rem;
+    padding-bottom: 8rem;
     overflow: hidden;
   }
 }
