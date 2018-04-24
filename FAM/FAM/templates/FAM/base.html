@@ -48,16 +48,28 @@
   	   	<nav id="header-nav-wrap">
   			<ul class="header-main-nav">
 
-         <li><a class="smoothscroll"  href= "#about" title="About">About</a></li>
+         <li><a class="smoothscroll"  href="#about" title="About">About</a></li>
 
   				<li><a class="smoothscroll"  href="#testimonials" title="trending">Trending</a></li>
   				<li><a href= {% url "browse_asset" %} >Browse</a></li>
-  			</ul>
+
 
               <!-- <a href="signup.html" title="sign-up" class="button button-primary cta">Sign In</a> -->
+              {% if user.is_authenticated %}
 
-              <a href= {% url "signup" %} class="button button-primary cta">Sign Up</a>
-              <a href= {% url "login" %} class="button button-primary cta">Login</a>
+              <div class="dropdown">
+                <li><a href= {% url "signup" %} >{{ user.username }}</a></li>
+                  <div class="dropdown-content">
+                    <a href="#" title="account">Investments</a>
+                    <a href="#" title="account">Sign out</a>
+                  </div>
+
+              </div>
+            </ul>
+              {% else %}
+                <a href= {% url "signup" %} class="button button-primary cta">Sign Up</a>
+                <a href= {% url "login" %} class="button button-primary cta">Login</a>
+              {% endif %}
               <div class="dropdown-content"></div>
   		</nav>
 
