@@ -54,28 +54,34 @@ class Account(models.Model):
         return {symbol:assets}
 
     def get_all_investments(self):
-        assets = []
-        for asset in StockInvestment.objects.filter(investor=self.user):
-            assets.append(asset)
-        for asset in OptionInvestment.objects.filter(investor=self.user):
-            assets.append(asset)
-        for asset in CryptoInvestment.objects.filter(investor=self.user):
-            assets.append(asset)
-        investments = {}
-        for asset in assets:
-            if not investments.has_key(asset.symbol):
-                investments[asset.symbol] = [asset]
+        investments = []
+        for investment in StockInvestment.objects.filter(investor=self.user):
+            investments.append(investment)
+        for investment in OptionInvestment.objects.filter(investor=self.user):
+            investments.append(investment)
+        for investment in CryptoInvestment.objects.filter(investor=self.user):
+            investments.append(investment)
+        all_investments = {}
+        for investment in investments:
+            if not investment.asset.symbol in investments:
+                all_investments[investment.asset.symbol] = [investment]
             else:
-                investments[asset.symbol].append(asset)
-        return investments
+                all_investments[investment.asset.symbol].append(investment)
+        return all_investments
 
     def update_current_balance(self):
         balance = 0
         investments = self.get_all_investments()
         for key, value in investments.items():
             for item in value:
-                item.update_data()
-                balance += item.price * item.quantity
+                item.asset.update_data()
+                if Stock.objects.filter(symbol=item.asset.symbol) or Option.objects.filter(symbol=item.asset.symbol):
+                    balance += item.asset.last * item.quantity
+                else:
+                    base = item.asset.symbol.replace("BTC","")
+                    usd_ticker = hitbtc.get_ticker(symbol = base + "USD")["last"]
+                    balance += float(usd_ticker) * float(item.quantity)
+                    print(balance)
 
         if balance != self.current_balance:
             self.current_balance = balance
@@ -107,9 +113,8 @@ class Account(models.Model):
 
         for key,val in chart.items():
             chart[key] = sum(val)
-
-        for key,val in chart.items():
-            print (key, val)
+        self.chart = chart
+        self.save()
 
 class StockInvestment(models.Model):
     investor = models.ForeignKey(User, on_delete=models.CASCADE)

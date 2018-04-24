@@ -35,11 +35,12 @@ class Stock(models.Model):
         return json.loads(self.month_chart)
 
     def update_month_chart(self):
-        self.week_chart = tradier.get_candlestick(self.symbol,30)
+        self.month_chart = tradier.get_candlestick(self.symbol,30)
         self.save()
 
     def update_data(self):
         ticker = tradier.get_ticker(self.symbol)
+        print(ticker)
         self.bid = ticker["bid"]
         self.ask = ticker["ask"]
         self.last = ticker["last"]
@@ -84,7 +85,7 @@ class Option(models.Model):
         return json.loads(self.month_chart)
 
     def update_month_chart(self):
-        self.week_chart = tradier.get_candlestick(self.symbol,30)
+        self.month_chart = tradier.get_candlestick(self.symbol,30)
         self.save()
 
     def update_data(self):
@@ -130,11 +131,11 @@ class Cryptocurrency(models.Model):
         return json.loads(self.month_chart)
 
     def update_month_chart(self):
-        self.week_chart = hitbtc.get_candlestick(self.symbol,30)
+        self.month_chart = hitbtc.get_candlestick(self.symbol,30)
         self.save()
 
-    def update_ticker(self):
-        ticker = hitbtc.get_ticker(self.symbol)
+    def update_data(self):
+        ticker_data = hitbtc.get_ticker(self.symbol)
         self.bid = float(ticker_data["bid"])
         self.ask = float(ticker_data["ask"])
         self.last = float(ticker_data["last"])

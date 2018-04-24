@@ -23,6 +23,7 @@ tradier = Tradier()
 stocks = tradier.get_all_tickers()
 print(len(stocks))
 saved = list([item.symbol for item in Stock.objects.all()])
+print (len(saved))
 for stock in stocks:
     if stock["symbol"] not in saved:
         new_stock = Stock()

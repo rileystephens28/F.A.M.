@@ -42,19 +42,19 @@ class Tradier(SourceAPI):
         today = datetime.now()
         start = (today - timedelta(days=days)).strftime("%Y-%m-%d %H-%M")
         url = 'https://api.tradier.com/v1/markets/timesales'
-        params = {"symbol":symbol,'interval':'15min','session_filter':'open','start':start}
-        candle_data = requests.get(url, headers=self.headers, params=params).json()
-        cleaned_data = list([candle for candle in candle_data["series"]["data"] if datetime.strptime(candle["time"],"%Y-%m-%dT%H:%M:%S").minute == 0])
+        params = {"symbol":symbol,'interval':'15min','session_filter':'all','start':start}
+        candle_data = requests.get(url, headers=self.headers, params=params).json()["series"]["data"]
+        #cleaned_data = list([candle for candle in candle_data["series"]["data"] if datetime.strptime(candle["time"],"%Y-%m-%dT%H:%M:%S").minute == 0])
         weekend = []
         for x in range(1,3):
-            for candle in cleaned_data:
+            for candle in candle_data:
                 if datetime.strptime(candle["time"],"%Y-%m-%dT%H:%M:%S").weekday() == 4:
                     new_candle = candle.copy()
                     new_candle["time"] = str((datetime.strptime(new_candle["time"],"%Y-%m-%dT%H:%M:%S") + timedelta(days = x)).strftime("%Y-%m-%dT%H:%M:%S"))
                     weekend.append(new_candle)
 
-        cleaned_data += weekend
-        cleaned_data = sorted(cleaned_data, key = lambda x: datetime.strptime(x["time"],"%Y-%m-%dT%H:%M:%S"))
+        candle_data += weekend
+        cleaned_data = sorted(candle_data, key = lambda x: datetime.strptime(x["time"],"%Y-%m-%dT%H:%M:%S"))
         #for candle in cleaned_data:
         #    print(candle['time'], candle['close'])
         return json.dumps(cleaned_data)

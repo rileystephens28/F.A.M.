@@ -3,16 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from accounts.models import Account
 from django.contrib.auth.models import User
 
-
-class SignUpForm(UserCreationForm):
-    first_name = forms.CharField(max_length=30, required=True)
-    last_name = forms.CharField(max_length=30, required=True)
-
-    class Meta:
-        model = User
-        fields = ("first_name","last_name","username", "password1", "password2")
-
 class AddInvestment(forms.Form):
-    purchase_date = forms.DateField(required=False, help_text='Purchase Date')
-    purchase_price = forms.FloatField(required=True, help_text='Purchase Price')
-    quantity = forms.FloatField(required=True, help_text='Quantity')
+    purchase_date = forms.DateField(required=False)
+    purchase_price = forms.FloatField(required=True)
+    quantity = forms.FloatField(required=True)

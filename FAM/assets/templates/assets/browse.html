@@ -19,97 +19,80 @@
  </form>
  </br>
  {% if asset != None %}
-   <div style="height:300;
+   <div style="height:800;
                display: block;
                margin-left: auto;
                margin-right: auto;
-               width: 50%;">
+               width: 70%;">
      {{ graph|safe }}
      </br>
+  </div>
    {% if type == "crypto" %}
 
-   <table>
-     <tr>
-       <th>{{ asset.symbol }}</th>
-     </tr>
-     <tr>
-       <td>Bid</td>
-       <td>{{ asset.bid }}</td>
-     </tr>
-     <tr>
-       <td>Ask</td>
-       <td>{{ asset.ask }}</td>
-     </tr>
-     <tr>
-       <td>Last</td>
-       <td>{{ asset.last }}</td>
-     </tr>
-     <tr>
-       <td>Base Volume</td>
-       <td>{{ asset.base_volume }}</td>
-     </tr>
-     <tr>
-       <td>quote_volume</td>
-       <td>{{ asset.quote_volume }}</td>
-     </tr>
-     <tr>
-   </table>
+   <div class="row half-bottom">
+
+      <div class="col-twelve">
+
+         <h3>{{ asset.symbol }}</h3>
+
+         <ul class="stats-tabs">
+          <li><a> {{ asset.bid }} <em>Bid</em></a></li>
+          <li><a> {{ asset.ask }} <em>Ask</em></a></li>
+          <li><a> {{ asset.last }} <em>Last</em></a></li>
+          <li><a> {{ asset.base_volume }} <em>Base Volume</em></a></li>
+          <li><a> {{ asset.quote_volume }} <em>Quote Volume</em></a></li>
+          <li><a> {{ asset.high }} <em>High</em></a></li>
+          <li><a> {{ asset.low }} <em>Low</em></a></li>
+       </ul>
+
+      </div>
+
+   </div> <!-- end row -->
 
    {% else %}
 
-   <table style="width:30%">
-     <tr>
-       <th>{{ asset.symbol }}</th>
-     </tr>
-     <tr>
-       <td>Bid</td>
-       <td>{{ asset.bid }}</td>
-     </tr>
-     <tr>
-       <td>Ask</td>
-       <td>{{ asset.ask }}</td>
-     </tr>
-     <tr>
-       <td>Last</td>
-       <td>{{ asset.last }}</td>
-     </tr>
-     <tr>
-       <td>Volume</td>
-       <td>{{ asset.volume }}</td>
-     </tr>
-     <tr>
-     <tr>
-       <td>High</td>
-       <td>{{ asset.high }}</td>
-     </tr>
-     <tr>
-       <td>Low</td>
-       <td>{{ asset.low }}</td>
-     </tr>
-     <tr>
-       <td>Open</td>
-       <td>{{ asset.open_price }}</td>
-     </tr>
-     <tr>
-       <td>Close</td>
-       <td>{{ asset.close_price }}</td>
-     </tr>
-   </table>
+   <div class="row half-bottom">
+
+      <div class="col-twelve">
+
+         <h3 align="center">{{ asset.symbol }}</h3>
+
+         <ul class="stats-tabs" align="center">
+          <li><a> {{ asset.bid }} <em>Bid</em></a></li>
+          <li><a> {{ asset.ask }} <em>Ask</em></a></li>
+          <li><a> {{ asset.last }} <em>Last</em></a></li>
+          <li><a> {{ asset.volume }} <em>Volume</em></a></li>
+          <li><a> {{ asset.high }} <em>High</em></a></li>
+          <li><a> {{ asset.low }} <em>Low</em></a></li>
+          <li><a> {{ asset.open_price }} <em>Open</em></a></li>
+          <li><a> {{ asset.close_price }} <em>Close</em></a></li>
+       </ul>
+
+      </div>
+
+   </div> <!-- end row -->
 
    {% endif %}
 
-   <form method="post" action = "{% url 'add_asset' %}">
+   <div class="purchase-d">
+
+   <form method="post" align="center" action = "{% url 'add_asset' %}">
      {% csrf_token %}
+     <div class = "formInput" align="center">
+       {{ form }}
+     </div>
      <button
        name = "q"
        type="submit"
        class="button"
+       align="center"
        value= "{{ asset.symbol }}"
        name="add">Add Asset
 
      </button>
     </form>
     </div>
+  </div>
 
  {% endif %}
 
@@ -135,7 +118,7 @@
 
                         <h3>Exxon Mobile Corporation</h3>
                         <p>
-                          insert chart of xom
+
                         </p>
 
                     </div>
@@ -148,7 +131,7 @@
 
                     <div class="service-content">
                         <h3>Total S.A.</h3>
-                        <p> insert TOT chart
+                        <p>
                         </p>
 
 
@@ -163,7 +146,7 @@
                     <div class="service-content">
                         <h3>Chevron Corporation</h3>
 
-                        <p> insert CVX chart
+                        <p>
                         </p>
 
                     </div>
@@ -192,7 +175,7 @@
 
                     <h3>Royal Gold Inc.</h3>
                     <p>
-                      insert chart of RGLD
+
                     </p>
 
                 </div>
@@ -205,7 +188,7 @@
 
                 <div class="service-content">
                     <h3>Helca Mining Company</h3>
-                    <p> insert HL chart
+                    <p>
                     </p>
 
 
@@ -220,7 +203,7 @@
                 <div class="service-content">
                     <h3>Elderado Gold</h3>
 
-                    <p> insert EGO chart
+                    <p>
                     </p>
 
                 </div>
@@ -249,7 +232,7 @@
 
                             <h3>Bitcoin</h3>
                             <p>
-                              insert chart of BTC
+
                             </p>
 
                         </div>
@@ -263,7 +246,7 @@
                         <div class="service-content">
                             <h3>Litecoin</h3>
 
-                            <p> insert TOT LTC
+                            <p>
                             </p>
 
 
@@ -278,7 +261,7 @@
                         <div class="service-content">
                             <h3>Ripple</h3>
 
-                            <p> insert XPR chart
+                            <p>
                             </p>
 
                         </div>

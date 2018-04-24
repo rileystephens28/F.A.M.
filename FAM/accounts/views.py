@@ -2,7 +2,7 @@ import datetime
 import plotly.offline as opy
 import plotly.graph_objs as go
 from django.shortcuts import render, redirect
-from django.contrib.auth import login
+from django.contrib.auth import login,logout
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
@@ -10,7 +10,11 @@ from django.http import HttpResponseRedirect
 import django
 from assets.models import Stock, Option, Cryptocurrency
 from .models import StockInvestment, OptionInvestment, CryptoInvestment, Account
-from accounts.forms import SignUpForm, AddInvestment
+from accounts.forms import AddInvestment
+from assets.update_data.hitbtc import HitBTC
+
+global hitbtc
+hitbtc = HitBTC()
 
 def signup_view(request):
     if request.method == 'POST':
@@ -33,11 +37,16 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
+            return redirect('home')
         else:
             form = AuthenticationForm()
     else:
         form = AuthenticationForm()
     return render(request, 'accounts/login.html', {'form': form})
+
+def logout_view(request):
+    logout(request)
+    return redirect('home')
 
 
 @login_required(login_url="/account/login/")
@@ -46,22 +55,23 @@ def add_asset(request):
         form = AddInvestment(data = request.POST)
         asset = request.POST.get("q")
         user = request.user
-        if Cryptocurrency.objects.filter(symbol = asset.upper()):
-            investment = CryptoInvestment()
-            investment.asset = Cryptocurrency.objects.get(symbol = asset)
-        elif Stock.objects.filter(symbol = asset.upper()):
-            investment = StockInvestment()
-            investment.asset = Stock.objects.get(symbol = asset)
-        elif Option.objects.filter(symbol = asset.upper()):
-            investment = OptionInvestment()
-            investment.asset = Option.objects.get(symbol = asset)
-        investment.investor = User.objects.get(username = user.get_username())
-        if form.cleaned_data.get('purchase_price'):
+        if form.is_valid():
+            if Cryptocurrency.objects.filter(symbol = asset.upper()):
+                investment = CryptoInvestment()
+                investment.asset = Cryptocurrency.objects.get(symbol = asset)
+            elif Stock.objects.filter(symbol = asset.upper()):
+                investment = StockInvestment()
+                investment.asset = Stock.objects.get(symbol = asset)
+            elif Option.objects.filter(symbol = asset.upper()):
+                investment = OptionInvestment()
+                investment.asset = Option.objects.get(symbol = asset)
+            investment.investor = User.objects.get(username = user.get_username())
+            if form.cleaned_data.get('purchase_price'):
+                investment.purchase_price = form.cleaned_data.get('purchase_price')
             investment.purchase_price = form.cleaned_data.get('purchase_price')
-        investment.purchase_price = form.cleaned_data.get('purchase_price')
-        investment.quantity = form.cleaned_data.get('quantity')
-        investment.purchase_date = django.utils.timezone.now
-        investment.save()
+            investment.quantity = form.cleaned_data.get('quantity')
+            investment.purchase_date = django.utils.timezone.now
+            investment.save()
 
         return redirect('investments')
     else:
@@ -90,23 +100,68 @@ def delete_asset(request):
 
 @login_required(login_url="/account/login/")
 def investment_view(request):
-    assets = []
     user_obj = request.user
     user = User.objects.get(username=user_obj.get_username())
     account = Account.objects.get(user=user)
     all_investments = account.get_all_investments()
-    for data in investment.asset.get_month_chart():
-        prices.append(data["price"])
-        dates.append(data["time"])
+    values = []
+    labels = []
+    account.update_current_balance()
+    for symbol in all_investments:
+        holdings = 0
+        price = 0
+        print(symbol)
+        for investment in all_investments[symbol]:
+            if Stock.objects.filter(symbol=investment.asset.symbol) or Option.objects.filter(symbol=investment.asset.symbol):
+                price += investment.asset.last
+            elif "USD" not in  investment.asset.symbol:
+                base = investment.asset.symbol.replace("BTC","")
+                usd_ticker = hitbtc.get_ticker(symbol = base + "USD")["last"]
+                price += float(usd_ticker)
+            else:
+                price += investment.asset.last
+            holdings +=  price * investment.quantity
+        values.append(holdings)
+        labels.append(symbol)
+
+    fig = {"data": [ {"values": values,
+                      "labels": labels,
+                      "domain": {"x": [0, .48]},
+                      "hoverinfo":"label+percent+name",
+                      "hole": .4,
+                      "type": "pie"}],
+          "layout": {"title":"Investment Breakdown",
+                     "annotations": [{"font": {"size": 20},
+                                      "showarrow": False,
+                                      "text": "",
+                                      "x": 0.20,
+                                      "y": 0.5}]
+                    }
+          }
+    piegraph = opy.plot(fig, auto_open=False, output_type='div')
+
+    investments = []
+    for symbol in all_investments:
+        purchase_price = 0
+        current_value = 0
+        price = all_investments[symbol][0].asset.update_data()
+        for investment in all_investments[symbol]:
+            purchase_price += investment.purchase_price * investment.quantity
+            current_value += investment.asset.bid * investment.quantity
+            chart = investment.asset.get_week_chart()
+            prices = list([item["close"] for item in chart])
+            dates = list([item["time"] for item in chart])
+        performance = '%.8f' %(current_value - purchase_price)
+        investments.append({symbol:performance})
 
     trace = go.Scatter(x = dates, y = prices)
 
     data=go.Data([trace])
-    layout=go.Layout(title="Investment performance", xaxis={'title':'Date'}, yaxis={'title':'$'})
+    layout=go.Layout(title="Investment Performance", xaxis={'title':'Date'}, yaxis={'title':'$'})
     figure=go.Figure(data=data,layout=layout)
-    graph = opy.plot(figure, auto_open=False, output_type='div')
+    linegraph = opy.plot(figure, auto_open=False, output_type='div')
 
-    return render(request, 'accounts/investments.html', {"assets":assets,"investments":all_investments})
+    return render(request, 'accounts/investments.html', {"investments":investments,'linegraph':linegraph,'piegraph':piegraph})
 
 @login_required(login_url="/account/login/")
 def performance_view(request,symbol):
@@ -116,18 +171,17 @@ def performance_view(request,symbol):
         asset = Stock.objects.get(symbol = symbol)
         if StockInvestment.objects.filter(investor = user, asset = asset):
             investment = StockInvestment.objects.get(investor = user, asset = asset)
+            asset_type = "stock"
 
     elif Cryptocurrency.objects.filter(symbol = symbol):
         asset = CryptoInvestment.objects.get(symbol = symbol)
         if CryptoInvestment.objects.filter(investor = user, asset = asset):
             investment = CryptoInvestment.objects.get(investor = user, asset = asset)
+            asset_type = "crypto"
 
     prices = []
     dates = []
-    print(investment.date)
     investment.asset.update_week_chart()
-    investment.asset.update_month_chart()
-
     for data in investment.asset.get_month_chart():
         prices.append(data["price"])
         dates.append(data["time"])
@@ -138,6 +192,5 @@ def performance_view(request,symbol):
     layout=go.Layout(title="Investment performance", xaxis={'title':'Date'}, yaxis={'title':'$'})
     figure=go.Figure(data=data,layout=layout)
     graph = opy.plot(figure, auto_open=False, output_type='div')
-    #print(graph)
 
-    return render(request, 'accounts/performance.html', {"investment":investment, 'graph':graph})
+    return render(request, 'accounts/performance.html', {"investment":investment, 'graph':graph, 'type':asset_type})

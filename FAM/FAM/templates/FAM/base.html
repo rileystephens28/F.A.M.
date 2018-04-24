@@ -60,8 +60,8 @@
               <div class="dropdown">
                 <li><a href= {% url "signup" %} >{{ user.username }}</a></li>
                   <div class="dropdown-content">
-                    <a href="#" title="account">Investments</a>
-                    <a href="#" title="account">Sign out</a>
+                    <a href= {% url "investments" %} title="account">Investments</a>
+                    <a href= {% url "logout" %} title="account">Sign out</a>
                   </div>
 
               </div>

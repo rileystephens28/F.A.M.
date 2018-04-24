@@ -105,6 +105,30 @@ body {
   /* padding-left: 4.5rem; */
 }
 
+.investments-body{
+  background-color: white;
+}
+
+.symbol-pie{
+
+}
+
+.symbol-d{
+  width: 50%;
+  padding-left: 25rem;
+  height: auto;
+}
+
+.pie-d{
+  /* width: 40%; */
+  height: auto;
+}
+
+.purchase-d{
+  /* padding-left: 10rem; */
+  padding right: 10rem;
+}
+
 .dropdown-content{
   display: none;
     position: absolute;
@@ -147,6 +171,10 @@ body {
   display: block;
 }
 
+.formInput {
+  display: inline;
+  align-items: center;
+}
 body {
   background: #141515;
   font-family: "muli-regular", sans-serif;

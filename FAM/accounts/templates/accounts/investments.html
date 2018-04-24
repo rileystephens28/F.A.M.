@@ -1,34 +1,67 @@
 {% extends 'FAM/base.html' %}
 
 {% block content %}
-<br>
-</br>
-<br>
-</br>
-{% if assets %}
-  {% for asset in assets %}
-    <div class = "menu">
-      <ul>
-        <li><a href={% url 'performance' asset.symbol %}>Symbol: {{ asset.symbol }}</a></li>
-        <li> <a>Bid: {{ asset.bid }}</a> </li>
-        <li><a>Ask: {{ asset.ask }}</a> </li>
-        <li> <a>Last: {{ asset.last }}</a></li>
-      </ul>
-    </div>
-    <form method="post" action = "{% url 'delete_asset' %}">
-      {% csrf_token %}
-      <button
-        name = "q"
-        type="submit"
-        class="button"
-        value= "{{ asset.symbol }}"
-        name="delete">Remove Asset
-      </button>
-     </form>
+<div class = "investments-body">
+  <br>
   </br>
-  {% endfor %}
-{% else %}
-  <h3>You are not tracking any assets.</h3>
-{% endif %}
+  <br>
+  </br>
+  <div style="height:800;
+              display: block;
+              margin-left: auto;
+              margin-right: auto;
+              width: 70%;">
 
+    {{ linegraph|safe }}
+    <br>
+  </div>
+
+
+<div class="symbol-pie">
+  <div class = "symbol-d">
+  {% if investments %}
+
+    <div class="column">
+
+       <div class="col-twelve">
+
+          <h2>Investments</h2>
+
+          {% for investment in investments %}
+
+            {% for key,val in investment.items %}
+
+              <ul class="stats-tabs">
+                <li><a href= {% url "performance" key %}> {{ key }} <em>Symbol</em></a></li>
+                <li><a> {{ val }} <em>Performance</em></a></li>
+              </ul>
+
+           {% endfor %}
+
+         {% endfor %}
+
+        </div>
+
+      </div> <!-- end row -->
+    </div>
+<div class="pie-d">
+      <div style="height:600;
+              display: block;
+              margin-left: auto;
+              padding-right: 20rem;
+              width: 40%;">
+
+              {{ piegraph|safe }}
+              <br>
+  </div>
+
+</div>
+    </div>
+    <!-- end symbol-pie -->
+
+
+  {% else %}
+    <h3>You are not tracking any assets.</h3>
+  {% endif %}
+</div>
 {% endblock %}
