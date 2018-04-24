@@ -30,21 +30,41 @@ def browse_view(request):
                 asset_type = "crypto"
 
             if asset != None:
+                if asset.type == "stock":
+                    asset.update_month_chart()
+                    chart = asset.get_month_chart()
+                    Dates = list([item["time"] for item in chart])
+                    Open = list([item["open"] for item in chart])
+                    High = list([item["high"] for item in chart])
+                    Low = list([item["low"] for item in chart])
+                    Close = list([item["close"] for item in chart])
 
-                prices = []
-                dates = []
-                asset.update_week_chart()
-                asset.update_month_chart()
-                for data in asset.get_week_chart():
-                    prices.append(data["price"])
-                    dates.append(data["time"])
 
-                trace = go.Scatter(x = dates, y = prices)
+                    trace = go.Candlestick(x=Dates,
+                           open = Open,
+                           high = High,
+                           low = Low,
+                           close = Close)
+                    data = [trace]
+                    layout=go.Layout(title="Candlestick", xaxis={'title':'Date'}, yaxis={'title':'$'})
+                    figure=go.Figure(data=data,layout=layout)
+                    graph = opy.plot(figure, auto_open=False, output_type='div')
+                    #py.iplot(data, filename='simple_candlestick')
 
-                data=go.Data([trace])
-                layout=go.Layout(title="Investment performance", xaxis={'title':'Date'}, yaxis={'title':'$'})
-                figure=go.Figure(data=data,layout=layout)
-                graph = opy.plot(figure, auto_open=False, output_type='div')
+                #prices = []
+                #dates = []
+                #asset.update_week_chart()
+                #asset.update_month_chart()
+                #for data in asset.get_week_chart():
+                #    prices.append(data["price"])
+                #    dates.append(data["time"])
+
+                #trace = go.Scatter(x = dates, y = prices)
+
+                #data=go.Data([trace])
+                #layout=go.Layout(title="Candlestick", xaxis={'title':'Date'}, yaxis={'title':'$'})
+                #figure=go.Figure(data=data,layout=layout)
+                #graph = opy.plot(figure, auto_open=False, output_type='div')
                 return render(request, 'assets/browse.html', {"asset": asset, "type": asset_type, 'graph':graph})
 
         else:

@@ -1,194 +1,75 @@
 import requests
-from requests.adapters import HTTPAdapter
-import ujson as json
-import sys
-sys.path.insert(0, "/home/riley_stephens/Django/FAM/FAM")
-import os
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "FAM.settings")
-from django.utils import timezone
-import django
-django.setup()
-from FAM.update_data.sourceAPI import SourceAPI
+import json
+from datetime import datetime, timedelta
+from assets.update_data.sourceAPI import SourceAPI
 from sources.models import StockExchange, OptionExchange
-from options.models import Option
-from stocks.models import Stock
-import time
-import datetime
-import threading
 
 class Tradier(SourceAPI):
 
     TRADIER_API_KEY = 'XCp8C02gIfnzIW99aTTU4jnPQGVJ'
+    headers = {'Authorization':'Bearer ' + TRADIER_API_KEY, 'Accept':'application/json'}
 
     def get_tradeable_assets(self):
         url = 'https://api.tradier.com/v1/markets/lookup'
-        params = {'types':'stock,etf,index','linebreak':'true'}
-        r = s.get(url, params=params)
-        content = json.loads(r.text)
-        stocks = Stock.objects.all()
-        stocks = [item.symbol for item in stocks]
-        for stock in content["securities"]["security"]:
-            if stock["symbol"] not in stocks:
-                new_stock = Stock()
-                new_stock.symbol = stock["symbol"]
-                new_stock.company = stock["description"]
-                if StockExchange.objects.filter(code=stock["exchange"]):
-                    new_stock.exchange = StockExchange.objects.get(code=stock["exchange"])
-                    new_stock.bid = 0
-                    new_stock.ask = 0
-                    new_stock.last = 0
-                    new_stock.price = 0
-                    new_stock.save()
-        stocks = Stock.objects.all()
-        stocks = [item.symbol for item in stocks]
-        return stocks
+        params = {'types':'stock,etf,index','exchanges':'Q,N,P,B','linebreak':'true'}
+        assets_data = requests.get(url, headers=self.headers, params=params).json()
+        assets = assets_data["securities"]["security"][:10000]
+        return assets
 
-    def get_data(self):
-        pass
+    def get_ticker(self,symbol):
+        url = 'https://api.tradier.com/v1/markets/quotes'
+        params = {"symbols":symbol}
+        try:
+            ticker_data = requests.get(url, headers=self.headers, params=params).json()
+            return ticker_data["quotes"]["quote"]
+        except:
+            return []
 
-    def get_all_data(self):
-        pass
+    def get_all_tickers(self):
+        all_assets = []
+        assets = list([item["symbol"] for item in self.get_tradeable_assets()])
+        assets = assets[:10000]
+        counter = 0
+        while len(assets[counter*100:counter*100+100]) == 100:
+            symbol_str = ",".join(assets[counter*100:counter*100+100])
+            all_assets += self.get_ticker(symbol_str)
+            counter += 1
+        symbol_str = ",".join(assets[counter*100:counter*100+100])
+        all_assets += self.get_ticker(symbol_str)
+        return all_assets
 
-    def getOptionExpirations(self,symbol):
+    def get_candlestick(self,symbol,days):
+        today = datetime.now()
+        start = (today - timedelta(days=days)).strftime("%Y-%m-%d %H-%M")
+        url = 'https://api.tradier.com/v1/markets/timesales'
+        params = {"symbol":symbol,'interval':'15min','session_filter':'open','start':start}
+        candle_data = requests.get(url, headers=self.headers, params=params).json()
+        cleaned_data = list([candle for candle in candle_data["series"]["data"] if datetime.strptime(candle["time"],"%Y-%m-%dT%H:%M:%S").minute == 0])
+        weekend = []
+        for x in range(1,3):
+            for candle in cleaned_data:
+                if datetime.strptime(candle["time"],"%Y-%m-%dT%H:%M:%S").weekday() == 4:
+                    new_candle = candle.copy()
+                    new_candle["time"] = str((datetime.strptime(new_candle["time"],"%Y-%m-%dT%H:%M:%S") + timedelta(days = x)).strftime("%Y-%m-%dT%H:%M:%S"))
+                    weekend.append(new_candle)
+
+        cleaned_data += weekend
+        cleaned_data = sorted(cleaned_data, key = lambda x: datetime.strptime(x["time"],"%Y-%m-%dT%H:%M:%S"))
+        #for candle in cleaned_data:
+        #    print(candle['time'], candle['close'])
+        return json.dumps(cleaned_data)
+
+    def get_option_expirations(self,symbol):
         url = 'https://api.tradier.com/v1/markets/options/expirations'
-        params = {'symbol':symbol}
-        r = s.get(url, params=params)
-        j = json.loads(r.text)
-        expirations = []
-        for expiration in j['expirations']['date']:
-            expirations.append(expiration)
-        return expirations
+        params = {"symbol":symbol}
+        exp_data = requests.get(url, headers=self.headers, params=params).json()
+        return exp_data['expirations']['date']
 
-    def getOptionChain(self,symbol,expiration):
+    def get_option_chain(self,symbol,expiration):
         url = 'https://api.tradier.com/v1/markets/options/chains'
         params = {'symbol':symbol,'expiration':expiration}
-        r = s.get(url, params=params)
-        j = json.loads(r.text)
-        symbols = []
-        for option in j['options']['option']:
-            symbols.append(option['symbol'])
-        return symbols
+        option_data = requests.get(url, headers=self.headers, params=params).json()
+        return option_data["options"]["option"]
 
-    def getSessionID(self):
-        url = 'https://api.tradier.com/v1/markets/events/session'
-        r = s.post(url)
-        j = json.loads(r.text)
-        sessionid = j['stream']['sessionid']
-        return sessionid
-
-    def stream_data(self,session_id,symbols):
-        url = 'https://stream.tradier.com/v1/markets/events'
-        params = {'sessionid':session_id,'linebreak':'true','filter':'trade,timesale,summary','symbols':symbols}
-        #'filter':'trade',
-        r = s.post(url,data=params,stream=True)
-        #print(r.status_code)
-        print("Opening stream...")
-        for line in r.iter_lines():
-            if line: # filter out keep-alive new lines
-                if "is not a valid symbol" in str(line):
-                    line = str(line)
-                    print(str(line))
-                    symbol = symbol.replace("b'","")
-                    symbol = symbol.replace("'","")
-                    symbol = line.replace(" is not a valid symbol","")
-                    print (symbol)
-                    bad_stock = Stock.objects.get(symbol = symbol)
-                    bad_stock.delete()
-                    print("Just deleted %s from database" % bad_stock)
-                data = json.loads(line)
-                if data["type"] != "option"
-                    try:
-                        self.parse_stock(data)
-                    except:
-                        print(sys.exc_info())
-                        print(data)
-                else:
-                    try:
-                        self.parse_option(data)
-                    except:
-                        print(sys.exc_info())
-                        print(data)
-
-    def parse_stock(self, data):
-            if Stock.objects.get(symbol=data["symbol"]):
-                stock = Stock.objects.get(symbol=data["symbol"])
-            else:
-                stock = Stock()
-                stock.symbol = data["symbol"]
-            if data["type"] == "trade":
-                if data["price"] != "" and data["price"] != 'NaN':
-                    stock.price = data["price"]
-                else:
-                    stock.price = 0
-                if data["cvol"] != "" and data["cvol"] != 'NaN':
-                    stock.volume = data["cvol"]
-                else:
-                    stock.volume = 0
-                if data["last"] != "" and data["last"] != 'NaN':
-                    stock.last = data["last"]
-                else:
-                    stock.last = 0
-            elif data["type"] == "timesale":
-                if data["bid"] != "" and data["bid"] != 'NaN':
-                    stock.bid = data["bid"]
-                else:
-                    stock.bid = 0
-                if data["ask"] != "" and data["ask"] != 'NaN':
-                    stock.ask = data["ask"]
-                else:
-                    stock.ask = 0
-            else:
-                if data["prevClose"] != "" and data["prevClose"] != 'NaN':
-                    stock.close_price = data["prevClose"]
-                else:
-                    stock.close_price = 0
-                if data["open"] != "" and data["open"] != 'NaN':
-                    stock.open_price = data["open"]
-                else:
-                    stock.open_price = 0
-                if data["high"] != "" and data["high"] != 'NaN':
-                    stock.high = data["high"]
-                else:
-                    stock.high = 0
-                if data["low"] != "" and data["low"] != 'NaN':
-                    stock.low = data["low"]
-                else:
-                    stock.low = 0
-            stock.save()
-
-    def parse_option(self,data):
-        pass
-
-tradier = Tradier("Tradier")
-s = requests.Session()
-s.mount('https://', HTTPAdapter(max_retries=1))
-s.headers.update({'Authorization':'Bearer ' + tradier.TRADIER_API_KEY, 'Accept':'application/json'})
-#stocks = tradier.get_tradeable_assets()
-nyse = StockExchange.objects.get(name = "NYSE")
-session_id = tradier.getSessionID()
-#nasdq = StockExchange.objects.get(name = "Nasdaq OMX")
-num_stocks = len(Stock.objects.filter(exchange=nyse))
-print(num_stocks)
-x = 0
-total = 0
-symbol_list = []
-for stock in Stock.objects.filter(exchange=nyse):
-    if num_stocks - total > 100:
-        if x == 100:
-            symbol_str = ",".join(symbol_list)
-            t = threading.Thread(target=tradier.stream_data, args=(session_id,symbol_str))
-            t.start()
-            x = 0
-            symbol_list = []
-        else:
-            symbol_list.append(stock.symbol)
-            x += 1
-    elif total == num_stocks:
-        symbol_str = ",".join(symbol_list)
-        t = threading.Thread(target=tradier.stream_data, args=(session_id,symbol_str))
-        t.start()
-        x = 0
-        symbol_list = []
-    else:
-        symbol_list.append(stock.symbol)
-    total += 1
+#tradier = Tradier()
+#tradier.get_candlestick("AAPL",7)
