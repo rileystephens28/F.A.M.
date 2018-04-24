@@ -5,8 +5,12 @@ from django.contrib.auth.models import User
 
 
 class SignUpForm(UserCreationForm):
-    first_name = forms.CharField(max_length=30, required=True, help_text='First Name')
-    last_name = forms.CharField(max_length=30, required=True, help_text='Last Name')
+    first_name = forms.CharField(max_length=30, required=True)
+    last_name = forms.CharField(max_length=30, required=True)
+
+    class Meta:
+        model = User
+        fields = ("first_name","last_name","username", "password1", "password2")
 
 class AddInvestment(forms.Form):
     purchase_date = forms.DateField(required=False, help_text='Purchase Date')
