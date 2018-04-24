@@ -6,13 +6,16 @@
 
    <!-- home
    ================================================== -->
+
+<div class="search-body" data-image-src= {% static "FAM/images/hero-bg.jpg" %}>
  </br>
  </br>
 
- <form class = "site-form" action = "{% url 'browse_asset' %}" method="post">
-   <input type="text" name="q" placeholder="Search stocks and cryptocurrencies..." id="id_q" value="{{ query }}"/>
+ <form class = "site-form" align="center" action = "{% url 'browse_asset' %}" method="post">
+   <input type="text" align="center" name="q" placeholder="Search.." id="id_q" value="{{ query }}"/>
    {% csrf_token %}
-   <input type="submit" value="Search" />
+
+   <span class="search-button-d"><input type="submit" value="Search" /></span>
  </form>
  </br>
  {% if asset != None %}
@@ -109,6 +112,8 @@
     </div>
 
  {% endif %}
+
+</div>
 
     <!-- Trending suggestions
     ================================================== -->

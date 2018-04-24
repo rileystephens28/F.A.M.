@@ -78,6 +78,33 @@ body {
   padding-right: 15rem;
 }
 
+.login-body {
+  background-color: white;
+  font-family: "muli-regular", sans-serif;
+  font-size: 1.6rem;
+  line-height: 1.875;
+  color: #767676;
+  margin: 0;
+  padding: 0;
+  padding-left: 40%;
+  /* padding-right: 50%; */
+}
+
+.login-button-d{
+  padding-left: 4.5rem;
+}
+
+.search-body{
+  /* background-color: white; */
+  background-color: white;
+  padding-top: 10%;
+  /* padding-left: 40%; */
+}
+
+.search-button-d{
+  /* padding-left: 4.5rem; */
+}
+
 body {
   background: #141515;
   font-family: "muli-regular", sans-serif;
@@ -598,6 +625,10 @@ select {
   -webkit-transition: all 0.3s ease-in-out;
   transition: all 0.3s ease-in-out;
   border-radius: 5px;
+}
+
+input[type="text"]{
+  display: inline-block;
 }
 
 .ss-custom-select {
@@ -1210,7 +1241,7 @@ h1.intro-header::before {
   z-index: 501;
 }
 
-.header-logo a {
+/* .header-logo a {
   display: block;
   margin: 0;
   padding: 0;
@@ -1225,15 +1256,15 @@ h1.intro-header::before {
   color: transparent;
   -webkit-transition: all 0.5s ease-in-out;
   transition: all 0.5s ease-in-out;
-}
+} */
 
-.header-logo h1{
+.header-logo h1 a{
   display: block;
   float: left;
   color: white;
-  padding-top: 2rem;
+  padding-top: .5rem;
   font-family: serif;
-  font-size: 5rem;
+  font-size: 4.5rem;
 }
 
 
