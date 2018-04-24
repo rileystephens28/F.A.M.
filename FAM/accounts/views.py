@@ -6,6 +6,7 @@ from django.contrib.auth import login
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseRedirect
 import django
 from assets.models import Stock, Option, Cryptocurrency
 from .models import StockInvestment, OptionInvestment, CryptoInvestment, Account
@@ -13,20 +14,17 @@ from accounts.forms import SignUpForm, AddInvestment
 
 def signup_view(request):
     if request.method == 'POST':
-        form = SignUpForm(request.POST)
+        form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
-            if not Account.objects.filter(user=user):
-                account = Account()
-                account.user = user
-                account.name = form.cleaned_data.get('first_name') + ' ' + form.cleaned_data.get('last_name')
-                account.save()
-                return redirect('home')
-            else:
-                return redirect('login')
+            account = Account()
+            account.user = user
+            account.save()
+            return redirect('home')
     else:
-        form = SignUpForm()
+        form = UserCreationForm()
+
     return render(request, 'accounts/signup.html', {'form': form})
 
 def login_view(request):
@@ -35,7 +33,6 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect('home')
         else:
             form = AuthenticationForm()
     else:
