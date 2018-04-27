@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from assets.models import Stock, Option, Cryptocurrency
 import django
 import datetime
+import json
 from assets.update_data.hitbtc import HitBTC
 from assets.update_data.tradier import Tradier
 
@@ -17,44 +18,49 @@ class Account(models.Model):
     current_balance = models.FloatField(blank = True, default=0)
     chart = models.TextField(default = None, null = True)
 
-    def add_investment(self, symbol, price, quantity):
+    def add_investment(self, symbol, price, quantity, purchase_date):
         if Stock.objects.filter(symbol=symbol):
             new_investment = StockInvestment()
             new_investment.asset = Stock.objects.get(symbol=symbol)
-            self.amount_invested += new_investment.purchase_price * new_investment.quantity
-            self.current_balance += new_investment.purchase_price * new_investment.quantity
+            self.amount_invested += float('%.2f' %(price * quantity))
+            self.current_balance += float('%.2f' %(price * quantity))
         elif Option.objects.filter(symbol=symbol):
             new_investment = OptionInvestment()
             new_investment.asset = Option.objects.get(symbol=symbol)
-            self.amount_invested += new_investment.purchase_price * new_investment.quantity
-            self.current_balance += new_investment.purchase_price * new_investment.quantity
+            self.amount_invested += float('%.2f' %(price * quantity))
+            self.current_balance += float('%.2f' %(price * quantity))
         elif Cryptocurrency.objects.filter(symbol=symbol):
             new_investment = CryptoInvestment()
             new_investment.asset = Cryptocurrency.objects.get(symbol=symbol)
-            usd_amount = hitbtc.get_ticker(symbol = asset.base + "USDT")
-            self.amount_invested += usd_amount * new_investment.quantity
-            self.current_balance += usd_amount * new_investment.quantity
+            add_amount = float('%.2f' %(new_investment.asset.get_usd_value() * quantity))
+            self.amount_invested += add_amount
+            self.current_balance += add_amount
+
         new_investment.investor = self.user
+        new_investment.date = purchase_date
         new_investment.purchase_price = price
         new_investment.quantity = quantity
         new_investment.save()
         self.save()
 
     def get_investment(self,symbol):
-        assets = []
-        if StockInvestment.objects.filter(investor=self.user, symbol=symbol):
-            for asset in StockInvestment.objects.filter(investor=self.user, symbol = symbol):
-                assets.append(asset)
-        if OptionInvestment.objects.filter(investor=self.user, symbol=symbol):
-            for asset in OptionInvestment.objects.filter(investor=self.user, symbol = symbol):
-                assets.append(asset)
-        if CryptoInvestment.objects.filter(investor=self.user, symbol=symbol):
-            for asset in CryptoInvestment.objects.filter(investor=self.user, symbol = symbol):
-                assets.append(asset)
-        return {symbol:assets}
+
+        if Stock.objects.filter(symbol=symbol):
+            asset = Stock.objects.get(symbol=symbol)
+            if StockInvestment.objects.filter(investor=self.user, asset=asset):
+                return StockInvestment.objects.get(investor=self.user, asset=asset)
+        elif Option.objects.filter(symbol=symbol):
+            asset = Option.objects.get(symbol=symbol)
+            if OptionInvestment.objects.filter(investor=self.user, asset=asset):
+                return OptionInvestment.objects.get(investor=self.user, asset=asset)
+        elif Cryptocurrency.objects.filter(symbol=symbol):
+            asset = Cryptocurrency.objects.get(symbol=symbol)
+            if CryptoInvestment.objects.filter(investor=self.user, asset=asset):
+                return CryptoInvestment.objects.get(investor=self.user, asset=asset)
 
     def get_all_investments(self):
         investments = []
+
         for investment in StockInvestment.objects.filter(investor=self.user):
             investments.append(investment)
         for investment in OptionInvestment.objects.filter(investor=self.user):
@@ -74,17 +80,14 @@ class Account(models.Model):
         investments = self.get_all_investments()
         for key, value in investments.items():
             for item in value:
-                item.asset.update_data()
                 if Stock.objects.filter(symbol=item.asset.symbol) or Option.objects.filter(symbol=item.asset.symbol):
                     balance += item.asset.last * item.quantity
                 else:
-                    base = item.asset.symbol.replace("BTC","")
-                    usd_ticker = hitbtc.get_ticker(symbol = base + "USD")["last"]
-                    balance += float(usd_ticker) * float(item.quantity)
-                    print(balance)
+                    balance += item.asset.get_usd_value() * item.quantity
 
         if balance != self.current_balance:
             self.current_balance = balance
+            self.current_balance = '%.2f' %self.current_balance
             self.save()
 
     def get_chart(self):
@@ -100,19 +103,26 @@ class Account(models.Model):
             assets.append(asset)
 
         chart = {}
-        for asset in assets:
-            asset_chart = asset.get_chart()
-            asset_dates = list([item[time] for item in asset_chart])
-            for date in asset_dates:
-                if not charts.has_key(date):
-                    day_list = list([item["close"] for item in asset_chart if item["time"] == date])
-                    chart[date] = [(sum(day_list)/len(day_list)) * asset.quantity]
-                else:
-                    day_list = list([item["close"] for item in asset_chart if item["time"] == date])
-                    chart[date].append((sum(day_list)/len(day_list)) * asset.quantity)
 
-        for key,val in chart.items():
-            chart[key] = sum(val)
+        for asset in assets:
+            asset.update_chart()
+            asset_chart = asset.get_chart()
+            asset_dates = list([str(datetime.datetime.strptime(item['time'],"%Y-%m-%dT%H:%M:%S").date()) for item in asset_chart])
+            for date in asset_dates:
+                price_list = list([float(item["close"]) for item in asset_chart if str(datetime.datetime.strptime(item['time'],"%Y-%m-%dT%H:%M:%S").date()) == date])
+                if not date in chart.keys():
+                    chart[date] = list([item for item in price_list])
+                else:
+                    chart[date] += price_list
+
+        for date in chart.keys():
+            print(date)
+            #print(chart[date])
+            if len(chart[date]) > 1:
+                chart[date] = sum(chart[date])/len(chart[date])
+            #chart[str(date)] = chart.pop(date)
+        chart = json.dumps(chart)
+
         self.chart = chart
         self.save()
 
@@ -121,7 +131,7 @@ class StockInvestment(models.Model):
     asset = models.ForeignKey(Stock, on_delete=models.CASCADE)
     purchase_price = models.FloatField(default = None)
     quantity = models.FloatField(default = None, null = True)
-    date = models.DateField(default = django.utils.timezone.now)
+    date = models.DateField(default = None)
     performance = models.FloatField(default = None, null = True)
     chart = models.TextField(default = None, null = True)
 
@@ -129,8 +139,10 @@ class StockInvestment(models.Model):
         return json.loads(self.chart)
 
     def update_chart(self):
-        days = (datetime.now() - self.date).days
-        self.chart = tradier.get_candlestick(self.symbol,days)
+        print(self.date)
+        days = (datetime.datetime.now().date() - self.date).days
+        print(days)
+        self.chart = tradier.get_candlestick(self.asset.symbol,days)
         self.save()
 
     def update_performance(self):
@@ -143,7 +155,7 @@ class OptionInvestment(models.Model):
     asset = models.ForeignKey(Option, on_delete=models.CASCADE)
     purchase_price = models.FloatField(default = None)
     quantity = models.FloatField(default = None, null = True)
-    date = models.DateField(default = django.utils.timezone.now)
+    date = models.DateField(default = None)
     performance = models.FloatField(default = None, null = True)
     chart = models.TextField(default = None, null = True)
 
@@ -151,8 +163,8 @@ class OptionInvestment(models.Model):
         return json.loads(self.chart)
 
     def update_chart(self):
-        days = (datetime.now() - self.date).days
-        self.chart = tradier.get_candlestick(self.symbol,days)
+        days = (datetime.datetime.now().date() - self.date).days
+        self.chart = tradier.get_candlestick(self.asset.symbol,days)
         self.save()
 
     def update_performance(self):
@@ -164,7 +176,7 @@ class CryptoInvestment(models.Model):
     asset = models.ForeignKey(Cryptocurrency, on_delete=models.CASCADE)
     purchase_price = models.FloatField(default = None)
     quantity = models.FloatField(default = None, null = True)
-    date = models.DateField(default = django.utils.timezone.now)
+    date = models.DateField(default = None)
     performance = models.FloatField(default = None, null = True)
     chart = models.TextField(default = None, null = True)
 
@@ -172,8 +184,8 @@ class CryptoInvestment(models.Model):
         return json.loads(self.chart)
 
     def update_chart(self):
-        days = (datetime.now() - self.date).days
-        self.chart = tradier.get_candlestick(self.symbol,days)
+        days = (datetime.datetime.now().date() - self.date).days
+        self.chart = hitbtc.get_candlestick(self.asset.symbol,days)
         self.save()
 
     def update_performance(self):

@@ -1,8 +1,8 @@
 from django.shortcuts import render
-from .models import Stock, Option, Cryptocurrency
 import plotly.offline as opy
 import plotly.graph_objs as go
 from accounts.forms import AddInvestment
+from .models import Stock, Option, Cryptocurrency
 
 def browse_view(request):
     query = None
@@ -55,7 +55,8 @@ def browse_view(request):
                 data = [trace]
                 layout=go.Layout(title="Week Chart", xaxis={'title':'Date'}, yaxis={'title':'Price($)'})
                 figure=go.Figure(data=data,layout=layout)
-                graph = opy.plot(figure, auto_open=False, output_type='div')
+                config={"displayModeBar": False, "showLink":False}
+                graph = opy.plot(figure, auto_open=False, config=config,output_type='div')
 
                 form = AddInvestment()
 

@@ -1,8 +1,7 @@
-from django.db import models
-from sources.models import StockExchange, OptionExchange, CryptoExchange
-import requests
 import json
 from datetime import datetime, timedelta
+from django.db import models
+from sources.models import StockExchange, OptionExchange, CryptoExchange
 from assets.update_data.tradier import Tradier
 from assets.update_data.hitbtc import HitBTC
 
@@ -29,6 +28,7 @@ class Stock(models.Model):
 
     def update_week_chart(self):
         self.week_chart = tradier.get_candlestick(self.symbol,7)
+        print(self.week_chart)
         self.save()
 
     def get_month_chart(self):
@@ -40,7 +40,6 @@ class Stock(models.Model):
 
     def update_data(self):
         ticker = tradier.get_ticker(self.symbol)
-        print(ticker)
         self.bid = ticker["bid"]
         self.ask = ticker["ask"]
         self.last = ticker["last"]
@@ -136,14 +135,23 @@ class Cryptocurrency(models.Model):
 
     def update_data(self):
         ticker_data = hitbtc.get_ticker(self.symbol)
-        self.bid = float(ticker_data["bid"])
-        self.ask = float(ticker_data["ask"])
-        self.last = float(ticker_data["last"])
-        self.high = float(ticker_data["high"])
-        self.low = float(ticker_data["low"])
-        self.base_volume = float(ticker_data["volume"])
-        self.quote_volume = float(ticker_data["volumeQuote"])
+        print(ticker_data)
+        self.bid = float('%.8f' %float(ticker_data["bid"]))
+        self.ask = float('%.8f' %float(ticker_data["ask"]))
+        self.last = float('%.8f' %float(ticker_data["last"]))
+        self.high = float('%.8f' %float(ticker_data["high"]))
+        self.low = float('%.8f' %float(ticker_data["low"]))
+        self.base_volume = float('%.8f' %float(ticker_data["volume"]))
+        self.quote_volume = float('%.8f' %float(ticker_data["volumeQuote"]))
         self.save()
+
+    def get_usd_value(self):
+        if "USD" not in  self.symbol:
+            usd_ticker = hitbtc.get_ticker(symbol = self.base + "USD")
+            if "error" in usd_ticker.keys():
+                usd_ticker = hitbtc.get_ticker(symbol = "BTCUSD")
+            return float(usd_ticker['last']) * self.last
+        return self.last
 
     def __str__(self):
         return self.symbol

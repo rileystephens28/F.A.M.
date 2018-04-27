@@ -1,67 +1,57 @@
 {% extends 'FAM/base.html' %}
 
 {% block content %}
-<div class = "investments-body">
-  <br>
-  </br>
-  <br>
-  </br>
-  <div style="height:800;
-              display: block;
-              margin-left: auto;
-              margin-right: auto;
-              width: 70%;">
 
-    {{ linegraph|safe }}
-    <br>
+<div style = "background-color:white">
+  <br>
+  </br>
+  <div class = 'row' style="margin-bottom:-10;">
+    <ul class="stats-tabs">
+      <li><a> ${{ account.amount_invested }} <em>Amount Invested</em></a></li>
+        {% if account.current_balance < account.amount_invested %}
+          <li><a><font color="red">${{ account.current_balance }} </font><em>Current Balance</em></a></li>
+        {% else %}
+          <li><a><font color="green">${{ account.current_balance }}</font><em>Current Balance</em></a></li>
+        {% endif %}
+    </ul>
   </div>
-
-
-<div class="symbol-pie">
-  <div class = "symbol-d">
   {% if investments %}
-
-    <div class="column">
-
-       <div class="col-twelve">
-
+    <div class = 'row'>
+      {{ linegraph|safe }}
+    </div>
+    <div class='row' style= 'margin-top': '25'>
+      <div class='four columns' style="float:right;width:50%;">
+        {{ piegraph|safe }}
+      </div>
+      <div class='four columns' style="float:left;width:50%;" >
+        {% if investments %}
           <h2>Investments</h2>
-
           {% for investment in investments %}
-
             {% for key,val in investment.items %}
-
               <ul class="stats-tabs">
                 <li><a href= {% url "performance" key %}> {{ key }} <em>Symbol</em></a></li>
-                <li><a> {{ val }} <em>Performance</em></a></li>
+                {% if val < 0 %}
+                  <li><a><font color="red">{{ val }}</font><em>Performance</em></a></li>
+                {% else %}
+                  <li><a><font color="green">{{ val }}</font><em>Performance</em></a></li>
+                {% endif %}
               </ul>
-
+            {% endfor %}
            {% endfor %}
-
-         {% endfor %}
-
-        </div>
-
-      </div> <!-- end row -->
+         {% else %}
+           <h3>You are not tracking any assets.</h3>
+         {% endif %}
+      </div>
     </div>
-<div class="pie-d">
-      <div style="height:600;
-              display: block;
-              margin-left: auto;
-              padding-right: 20rem;
-              width: 40%;">
-
-              {{ piegraph|safe }}
-              <br>
-  </div>
-
-</div>
-    </div>
-    <!-- end symbol-pie -->
-
-
   {% else %}
-    <h3>You are not tracking any assets.</h3>
+  <div align="center">
+  <h1 align="center">You are not tracking any assets.</h1>
+  <form class = "site-form" align="center" action = "{% url 'browse_asset' %}" method="post">
+    {% csrf_token %}
+    <button style="background-color:green;color:white;border:0" type="submit" action= {% url "browse_asset" %}>Add Investments</button>
+  </form>
   {% endif %}
+
 </div>
+
 {% endblock %}

@@ -58,7 +58,7 @@
               {% if user.is_authenticated %}
 
               <div class="dropdown">
-                <li><a href= {% url "signup" %} >{{ user.username }}</a></li>
+                <li><a>{{ user.username }}</a></li>
                   <div class="dropdown-content">
                     <a href= {% url "investments" %} title="account">Investments</a>
                     <a href= {% url "logout" %} title="account">Sign out</a>
