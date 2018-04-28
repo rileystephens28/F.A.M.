@@ -72,24 +72,20 @@
 
    {% endif %}
 
-   <div class="purchase-d">
-   <form method="post" align="center" action = "{% url 'add_asset' %}">
-     {% csrf_token %}
-     <div class = "formInput" align="center">
-       {{ form }}
-     </div>
-     <button style="background-color:green;color:white;border:0"
-       name = "q"
-       type="submit"
-       class="button"
-       align="center"
-       value= "{{ asset.symbol }}"
-       name="add">Add Asset
-
-     </button>
-    </form>
-    </div>
-  </div>
+   <div class="sign-up-body" align="center">
+     <form method="post" action = "{% url 'add_asset' %}">
+       {% csrf_token %}
+         {{ form }}
+       <button style="background-color:green;color:white;border:0"
+         name = "q"
+         type="submit"
+         class="button"
+         align="center"
+         value= "{{ asset.symbol }}"
+         name="add">Add Asset
+       </button>
+     </form>
+   </div>
 
  {% endif %}
 
