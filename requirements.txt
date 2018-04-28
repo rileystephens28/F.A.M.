@@ -4,6 +4,7 @@ decorator==4.3.0
 dj-database-url==0.5.0
 Django==2.0.4
 django-heroku==0.3.1
+gunicorn==19.8.0
 idna==2.6
 ipython-genutils==0.2.0
 jsonschema==2.6.0
