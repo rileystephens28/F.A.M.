@@ -17,7 +17,7 @@
  *  10. home
  *  11. about
  *  12. pricing
- *  13. testimonials
+ *  13. trending
  *  14. download
  *  15. footer styles
  *
@@ -174,6 +174,7 @@ body {
 .formInput {
   display: inline;
   align-items: center;
+  align-self: center;
 }
 body {
   background: #141515;
@@ -2455,48 +2456,48 @@ html[data-useragent*='MSIE 10.0'] .home-scrolldown,
 
 
 /* ===================================================================
- *  13. testimonials - (_layout.scss)
+ *  13. trending - (_layout.scss)
  *
  * ------------------------------------------------------------------- */
 
-#testimonials {
+#trending {
   background: #FFFFFF;
   padding: 15rem 0 9rem;
   text-align: center;
   min-height: 600px;
 }
 
-#testimonials h1::before {
+#trending h1::before {
   left: 50%;
   -webkit-transform: translateX(-50%);
   -ms-transform: translateX(-50%);
   transform: translateX(-50%);
 }
 
-#testimonials .owl-wrap {
+#trending .owl-wrap {
   width: 80%;
   max-width: 900px;
   margin: 4.2rem auto 0;
 }
 
-#testimonial-slider {
+#trending-slider {
   margin: 0 0 3rem 0;
   position: relative;
 }
 
-#testimonial-slider .slides {
+#trending-slider .slides {
   padding-bottom: 3rem;
 }
 
-#testimonial-slider p {
+#trending-slider p {
   font-family: "muli-regular", sans-serif;
   font-size: 3.2rem;
   line-height: 1.5;
   color: #FFFFFF;
 }
 
-#testimonial-slider p::before,
-#testimonial-slider p::after {
+#trending-slider p::before,
+#trending-slider p::after {
   display: inline-block;
   font-family: "muli-regular", serif;
   font-size: 3.6rem;
@@ -2505,19 +2506,19 @@ html[data-useragent*='MSIE 10.0'] .home-scrolldown,
   top: .3rem;
 }
 
-#testimonial-slider p::before {
+#trending-slider p::before {
   content: '\201C';
 }
 
-#testimonial-slider p::after {
+#trending-slider p::after {
   content: '\201D';
 }
 
-#testimonial-slider .testimonial-author {
+#trending-slider .trending-author {
   margin-top: 4.2rem;
 }
 
-#testimonial-slider .testimonial-author img {
+#trending-slider .trending-author img {
   width: 7.4rem;
   height: 7.4rem;
   margin: 0 auto 1.2rem auto;
@@ -2525,7 +2526,7 @@ html[data-useragent*='MSIE 10.0'] .home-scrolldown,
   border-radius: 50%;
 }
 
-#testimonial-slider .testimonial-author .author-info {
+#trending-slider .trending-author .author-info {
   display: inline-block;
   vertical-align: middle;
   text-align: center;
@@ -2536,7 +2537,7 @@ html[data-useragent*='MSIE 10.0'] .home-scrolldown,
   color: #151515;
 }
 
-#testimonial-slider .testimonial-author2 .author-info2{
+#trending-slider .trending-author2 .author-info2{
   display: block;
   background-color: black;
   vertical-align: middle;
@@ -2548,7 +2549,7 @@ html[data-useragent*='MSIE 10.0'] .home-scrolldown,
   color: #FFFFFF;
 }
 
-#testimonial-slider .testimonial-author .author-info span {
+#trending-slider .trending-author .author-info span {
   display: block;
   font-family: "muli-bold", sans-serif;
   font-size: 1.6rem;
@@ -2559,7 +2560,7 @@ html[data-useragent*='MSIE 10.0'] .home-scrolldown,
   margin-top: .3rem;
 }
 
-#testimonial-slider .testimonial-author2 .author-info2 span {
+#trending-slider .trending-author2 .author-info2 span {
   display: block;
   font-family: "muli-bold", sans-serif;
   font-size: 1.6rem;
@@ -2573,14 +2574,14 @@ html[data-useragent*='MSIE 10.0'] .home-scrolldown,
 
 /* owl dots */
 
-#testimonial-slider .owl-nav {
+#trending-slider .owl-nav {
   margin-top: 1.8rem;
   margin-bottom: 1.5rem;
   text-align: center;
   -webkit-tap-highlight-color: transparent;
 }
 
-#testimonial-slider .owl-nav [class*='owl-'] {
+#trending-slider .owl-nav [class*='owl-'] {
   color: #FFFFFF;
   font-family: "montserrat-regular", sans-serif;
   font-size: 1.4rem;
@@ -2596,33 +2597,33 @@ html[data-useragent*='MSIE 10.0'] .home-scrolldown,
   transition: all 0.3s ease-in-out;
 }
 
-#testimonial-slider .owl-nav [class*='owl-']:hover {
+#trending-slider .owl-nav [class*='owl-']:hover {
   background: rgba(0, 0, 0, 0.7);
   color: #FFFFFF;
   text-decoration: none;
 }
 
-#testimonial-slider .owl-nav .disabled {
+#trending-slider .owl-nav .disabled {
   background: rgba(0, 0, 0, 0.2);
   cursor: default;
 }
 
-#testimonial-slider .owl-nav.disabled+.owl-dots {
+#trending-slider .owl-nav.disabled+.owl-dots {
   margin-top: 1.8rem;
 }
 
-#testimonial-slider .owl-dots {
+#trending-slider .owl-dots {
   text-align: center;
   -webkit-tap-highlight-color: transparent;
 }
 
-#testimonial-slider .owl-dots .owl-dot {
+#trending-slider .owl-dots .owl-dot {
   display: inline-block;
   zoom: 1;
   *display: inline;
 }
 
-#testimonial-slider .owl-dots .owl-dot span {
+#trending-slider .owl-dots .owl-dot span {
   width: 9px;
   height: 9px;
   background-color: #959595;
@@ -2636,53 +2637,53 @@ html[data-useragent*='MSIE 10.0'] .home-scrolldown,
   transition: all 0.3s ease-in-out;
 }
 
-#testimonial-slider .owl-dots .owl-dot.active span,
-#testimonial-slider .owl-dots .owl-dot:hover span {
+#trending-slider .owl-dots .owl-dot.active span,
+#trending-slider .owl-dots .owl-dot:hover span {
   background-color: #39b54a;
 }
 
 
 /* -------------------------------------------------------------------
  * responsive:
- * testimonials
+ * trending
  * ------------------------------------------------------------------- */
 
 @media only screen and (max-width: 1024px) {
-  #testimonial-slider p {
+  #trending-slider p {
     font-size: 3rem;
   }
 }
 
 @media only screen and (max-width: 768px) {
-  #testimonial-slider p {
+  #trending-slider p {
     font-size: 2.6rem;
   }
-  #testimonial-slider .testimonial-author img {
+  #trending-slider .trending-author img {
     width: 6.6rem;
     height: 6.6rem;
   }
-  #testimonial-slider .testimonial-author .author-info {
+  #trending-slider .trending-author .author-info {
     font-size: 1.8rem;
   }
-  #testimonial-slider .testimonial-author .author-info span {
+  #trending-slider .trending-author .author-info span {
     font-size: 1.5rem;
   }
 }
 
 @media only screen and (max-width: 600px) {
-  #testimonials .owl-wrap {
+  #trending .owl-wrap {
     width: 90%;
   }
-  #testimonial-slider p {
+  #trending-slider p {
     font-size: 2.4rem;
   }
 }
 
 @media only screen and (max-width: 400px) {
-  #testimonials .owl-wrap {
+  #trending .owl-wrap {
     width: 100%;
   }
-  #testimonial-slider p {
+  #trending-slider p {
     font-size: 2rem;
   }
 }

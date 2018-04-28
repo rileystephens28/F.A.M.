@@ -13,7 +13,6 @@ tradier = Tradier()
 
 class Account(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE,)
-    name = models.CharField(blank=True, max_length=255)
     amount_invested = models.FloatField(blank = True, default=0)
     current_balance = models.FloatField(blank = True, default=0)
     chart = models.TextField(default = None, null = True)
@@ -116,11 +115,8 @@ class Account(models.Model):
                     chart[date] += price_list
 
         for date in chart.keys():
-            print(date)
-            #print(chart[date])
             if len(chart[date]) > 1:
                 chart[date] = sum(chart[date])/len(chart[date])
-            #chart[str(date)] = chart.pop(date)
         chart = json.dumps(chart)
 
         self.chart = chart
@@ -139,9 +135,7 @@ class StockInvestment(models.Model):
         return json.loads(self.chart)
 
     def update_chart(self):
-        print(self.date)
         days = (datetime.datetime.now().date() - self.date).days
-        print(days)
         self.chart = tradier.get_candlestick(self.asset.symbol,days)
         self.save()
 

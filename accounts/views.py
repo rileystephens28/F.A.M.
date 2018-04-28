@@ -23,7 +23,6 @@ def signup_view(request):
             login(request, user)
             account = Account()
             account.user = user
-            account.name = form.cleaned_data.get('first_name') + form.cleaned_data.get('last_name')
             account.save()
             return redirect('home')
     else:
@@ -56,7 +55,6 @@ def add_asset(request):
         account = Account.objects.get(user = request.user)
         if form.is_valid():
             if form.cleaned_data.get('purchase_date') != None:
-                print("got date from form")
                 purchase_date = form.cleaned_data.get('purchase_date')
             else:
                 purchase_date = django.utils.timezone.now
@@ -143,7 +141,6 @@ def performance_view(request,symbol):
     if Stock.objects.filter(symbol=symbol):
         asset = Stock.objects.get(symbol = symbol)
         if StockInvestment.objects.filter(investor = user, asset = asset):
-            print("its a stock investment")
             investment = StockInvestment.objects.get(investor = user, asset = asset)
             asset_type = "stock"
             performance = '$%.2f' %(asset.last - investment.purchase_price)

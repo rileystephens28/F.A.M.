@@ -28,7 +28,6 @@ class Stock(models.Model):
 
     def update_week_chart(self):
         self.week_chart = tradier.get_candlestick(self.symbol,7)
-        print(self.week_chart)
         self.save()
 
     def get_month_chart(self):
@@ -135,7 +134,6 @@ class Cryptocurrency(models.Model):
 
     def update_data(self):
         ticker_data = hitbtc.get_ticker(self.symbol)
-        print(ticker_data)
         self.bid = float('%.8f' %float(ticker_data["bid"]))
         self.ask = float('%.8f' %float(ticker_data["ask"]))
         self.last = float('%.8f' %float(ticker_data["last"]))
