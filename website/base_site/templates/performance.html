@@ -1,0 +1,90 @@
+{% extends 'FAM/base.html' %}
+
+{% block content %}
+<div style = "background-color:white">
+  <br>
+  </br>
+  <div class = row>
+    <ul class="stats-tabs">
+      <li><a> {{ investment.asset.symbol }}<em>Symbol</em></a></li>
+      {% if asset_type == "crypto" %}
+        <li><a> {{ investment.purchase_price }} BTC<em>Purchase Price</em></a></li>
+        {% if investment.asset.last < investment.purchase_price %}
+          <li><a><font color="red">{{ performance }} BTC<em></font>Performance</em></a></li>
+        {% else %}
+          <li><a><font color="green">{{ performance }} BTC<em></font>Performance</em></a></li>
+        {% endif %}
+      {% else %}
+        <li><a> ${{ investment.purchase_price }}<em>Purchase Price</em></a></li>
+        {% if investment.asset.last < investment.purchase_price %}
+          <li><a><font color="red">{{ performance }}<em></font>Performance</em></a></li>
+        {% else %}
+          <li><a><font color="green">{{ performance }}<em></font>Performance</em></a></li>
+        {% endif %}
+      {% endif %}
+    </ul>
+  </div>
+
+  <div class = 'row'>
+    {{ graph|safe }}
+  </div>
+
+  <br>
+  </br>
+
+  {% if type == "crypto" %}
+
+  <div class="row half-bottom">
+
+     <div class="col-twelve">
+
+        <ul class="stats-tabs" align="center">
+         <li><a> {{ investment.asset.bid }} <em>Bid</em></a></li>
+         <li><a> {{ investment.asset.ask }} <em>Ask</em></a></li>
+         <li><a> {{ investment.asset.last }} <em>Last</em></a></li>
+         <li><a> {{ investment.asset.base_volume }} <em>Base Volume</em></a></li>
+         <li><a> {{ investment.asset.quote_volume }} <em>Quote Volume</em></a></li>
+         <li><a> {{ investment.asset.high }} <em>High</em></a></li>
+         <li><a> {{ investment.asset.low }} <em>Low</em></a></li>
+      </ul>
+
+     </div>
+
+  </div> <!-- end row -->
+
+  {% else %}
+
+  <div class="row half-bottom">
+
+     <div class="col-twelve">
+
+        <ul class="stats-tabs" align="center">
+         <li><a> ${{ investment.asset.bid }} <em>Bid</em></a></li>
+         <li><a> ${{ investment.asset.ask }} <em>Ask</em></a></li>
+         <li><a> ${{ investment.asset.last }} <em>Last</em></a></li>
+         <li><a> ${{ investment.asset.volume }} <em>Volume</em></a></li>
+         <li><a> ${{ investment.asset.high }} <em>High</em></a></li>
+         <li><a> ${{ investment.asset.low }} <em>Low</em></a></li>
+         <li><a> ${{ investment.asset.open_price }} <em>Open</em></a></li>
+         <li><a> ${{ investment.asset.close_price }} <em>Close</em></a></li>
+      </ul>
+
+     </div>
+
+  </div> <!-- end row -->
+
+  {% endif %}
+
+  <form align="center" method="post" action = "{% url 'delete_asset' %}">
+    {% csrf_token %}
+    <button style="background-color:red;color:white;border:0"
+      name = "q"
+      type="submit"
+      class="button"
+      value= "{{ investment.asset.symbol }}"
+      name="delete">Remove Asset
+    </button>
+   </form>
+</div>
+
+{% endblock %}

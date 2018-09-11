@@ -1,0 +1,28 @@
+{% extends 'FAM/base.html' %}
+
+{% block content %}
+
+<div class="sign-up-body" align="center">
+  <br>
+  </br>
+  <br>
+  </br>
+
+  <h1><font size="20">Login</font></h1>
+  <br>
+  <form method="post">
+    {% csrf_token %}
+    <div class = 'row'>
+      {{ form.username.errors }}
+      {{ form.username }}
+    </div>
+    <br>
+    <div class = 'row'>
+      {{ form.password.errors }}
+      {{ form.password }}
+    </div>
+    <br>
+    <button style="background-color:green;color:white;border:0" type="submit">Sign in</button>
+  </form>
+
+{% endblock %}
