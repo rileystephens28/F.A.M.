@@ -33,46 +33,10 @@ class ClientManager:
         data = locals()['x']
         return data
 
-    def get_balance(self,exchange,symbol):
-        exec("x = self."+exchange+".get_balance('"+symbol+"')")
-        data = locals()['x']
-        return data
-
     def get_balances(self,exchange):
         exec("x = self."+exchange+".get_balances()")
         data = locals()['x']
         return data
-
-    def buy(self,exchange,base,quote,price,amount):
-        # Should be limit
-        exec("x = self."+exchange+".buy("+base+","+quote+","+price+","+amount+")")
-        data = locals()['x']
-        return data
-
-    def sell(self,exchange,base,quote,price,amount):
-        # Should be limit
-        exec("x = self."+exchange+".sell("+base+","+quote+","+price+","+amount+")")
-        data = locals()['x']
-        return data
-
-    def cancel_order(self,exchange,orderID):
-        exec("x = self."+exchange+".cancel_order("+orderID+")")
-        data = locals()['x']
-        return data
-
-    def get_open_orders(self,exchange):
-        exec("x = self."+exchange+".get_open_orders()")
-        data = locals()['x']
-        return data
-
-    def get_deposit_address(self,exchange,asset):
-        exec("x = self."+exchange+".get_deposit_address('"+asset+"')")
-        data = locals()['x']
-        return data
-
-    def withdraw(self,from_exchange,to_exchange,currency,amount):
-        address = self.get_deposit_address(to_exchange,asset)
-        exec(self._exchange(from_exchange)+".withdraw("+asset+","+amount+","+address+")")
 
     def get_trade_history(self,exchange,base,quote):
         exec("x = self."+exchange+".get_trade_history('"+base+"','"+quote+"')")
@@ -88,20 +52,6 @@ class ClientManager:
         exec("x = self."+exchange+".get_withdraw_history('"+asset+"')")
         data = locals()['x']
         return data
-
-    def get_trade_fee(self,exchange,base,quote):
-        exec("x = self."+exchange+".get_trade_fee('"+base+"','"+quote+"')")
-        data = locals()['x']
-        return data
-
-    def get_withdraw_fee(self,exchange,asset):
-        exec("x = self."+exchange+".get_withdraw_fee('"+asset+"')")
-        data = locals()['x']
-        return data
-
-    # def get_price(self,base,quote):
-    #     if CurrencyPair.objects.filter(base=base,quote=quote,exchange=self.exchange).exists():
-    #         return CurrencyPair.objects.filter(base=base,quote=quote,exchange=self.exchange).values("last")
 
 
 class WebSocketMananger:

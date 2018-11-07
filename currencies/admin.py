@@ -1,6 +1,5 @@
 from django.contrib import admin
-from .models import Stock, Option, Cryptocurrency
+from .models import Currency, CurrencyPair
 
-admin.site.register(Stock)
-admin.site.register(Option)
-admin.site.register(Cryptocurrency)
+admin.site.register(Currency)
+admin.site.register(CurrencyPair)

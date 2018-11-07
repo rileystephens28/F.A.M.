@@ -1,0 +1,120 @@
+<!doctype html>
+{% load staticfiles %}
+
+<html class="no-js" lang="en">
+<!--<![endif]-->
+
+  <head>
+
+      <!--- basic page needs
+     ================================================== -->
+      <meta charset="utf-8">
+      <title>Financial Asset Manager</title>
+      <meta name="description" content="">
+      <meta name="author" content="">
+
+      <!-- mobile specific metas
+     ================================================== -->
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+
+      <!-- CSS
+     ================================================== -->
+      <link rel="stylesheet" href= {% static "base_site/css/base.css" %}>
+      <link rel="stylesheet" href= {% static "base_site/css/vendor.css" %}>
+      <link rel="stylesheet" href= {% static "base_site/css/main.css" %}>
+
+      <!-- script
+     ================================================== -->
+      <script src= {% static "base_site/js/modernizr.js" %}></script>
+      <script src= {% static "base_site/js/pace.min.js" %}></script>
+
+      <!-- famicons
+  	================================================== -->
+      <link rel="shortcut icon" href= {% static "base_site/famicon.ico" %} type={% static "base_site/image/x-icon" %}>
+      <link rel="icon" href= {% static "base_site/famicon.ico" %} type= {% static "base_site/image/x-icon" %}>
+
+  </head>
+
+  <body id="top">
+
+      <!-- header
+     ================================================== -->
+     <header id="header" class="row">
+
+     		<div class="header-logo">
+  	        <h1><a href= {% url "home" %}>FAM</a></h1>
+  	    </div>
+
+  	   	<nav id="header-nav-wrap">
+  			<ul class="header-main-nav">
+
+         <li><a class="smoothscroll"  href="#about" title="About">About</a></li>
+
+  				<li><a class="smoothscroll"  href="#testimonials" title="trending">Trending</a></li>
+  				<li><a href= {% url "browse_asset" %} >Browse</a></li>
+
+
+              <!-- <a href="signup.html" title="sign-up" class="button button-primary cta">Sign In</a> -->
+              {% if user.is_authenticated %}
+
+              <div class="dropdown">
+                <li><a><img src={% static "base_site/images/user.png" %} style="width:40px; height:50px;padding-top:10px"></a></li>
+                  <div class="dropdown-content">
+                    <a href= {% url "investments" %} title="account">Investments</a>
+                    <a href= {% url "logout" %} title="account">Sign out</a>
+                  </div>
+
+              </div>
+            </ul>
+              {% else %}
+                <a href= {% url "signup" %} class="button button-primary cta">Sign Up</a>
+                <a href= {% url "login" %} class="button button-primary cta">Login</a>
+              {% endif %}
+              <div class="dropdown-content"></div>
+  		</nav>
+
+  		<a class="header-menu-toggle" href="#"><span>Menu</span></a>
+
+     </header> <!-- /header -->
+
+     <div>
+     {% block content %}
+     {% endblock %}
+     </div>
+
+     <footer>
+
+       <div class="footer-bottom">
+
+         <div class="row">
+
+           <div class="col-twelve">
+             <div class="copyright">
+               <span>© Copyright FAM 2018.</span>
+               <!-- <span>Design by <a href="http://www.styleshout.com/"></a></span> -->
+              </div>
+
+              <div id="go-top">
+                 <a class="smoothscroll" title="Back to Top" href="#top"><i class="icon-arrow-up"></i></a>
+              </div>
+           </div>
+
+         </div> <!-- end footer-bottom -->
+
+       </div>
+
+     </footer>
+
+     <div id="preloader">
+       <div id="loader"></div>
+     </div>
+
+     <!-- Java Script
+     ================================================== -->
+     <script src={% static "base_site/js/jquery-2.1.3.min.js" %}></script>
+     <script src={% static "base_site/js/plugins.js" %}></script>
+     <script src={% static "base_site/js/main.js" %}></script>
+
+  </body>
+
+</html>

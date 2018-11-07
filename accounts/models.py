@@ -1,187 +1,69 @@
 from django.db import models
-from django.contrib.auth.models import User
-from assets.models import Stock, Option, Cryptocurrency
-import django
-import datetime
-import json
-from assets.update_data.hitbtc import HitBTC
-from assets.update_data.tradier import Tradier
+from django.contrib.auth.models import BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser
+from currencies.models import Currency
 
-global hitbtc, tradier
-hitbtc = HitBTC()
-tradier = Tradier()
+class MyUserManager(BaseUserManager):
+    """
+    A custom user manager to deal with emails as unique identifiers for auth
+    instead of usernames. The default that's used is "UserManager"
+    """
+    def _create_user(self, email, password, **extra_fields):
+        """
+        Creates and saves a User with the given email and password.
+        """
+        if not email:
+            raise ValueError('The Email must be set')
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save()
+        return user
 
-class Account(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE,)
-    amount_invested = models.FloatField(blank = True, default=0)
-    current_balance = models.FloatField(blank = True, default=0)
-    chart = models.TextField(default = None, null = True)
+    def create_user(self, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_superuser', False)
+        return self._create_user(email, password, **extra_fields)
 
-    def add_investment(self, symbol, price, quantity, purchase_date):
-        if Stock.objects.filter(symbol=symbol):
-            new_investment = StockInvestment()
-            new_investment.asset = Stock.objects.get(symbol=symbol)
-            self.amount_invested += float('%.2f' %(price * quantity))
-            self.current_balance += float('%.2f' %(price * quantity))
-        elif Option.objects.filter(symbol=symbol):
-            new_investment = OptionInvestment()
-            new_investment.asset = Option.objects.get(symbol=symbol)
-            self.amount_invested += float('%.2f' %(price * quantity))
-            self.current_balance += float('%.2f' %(price * quantity))
-        elif Cryptocurrency.objects.filter(symbol=symbol):
-            new_investment = CryptoInvestment()
-            new_investment.asset = Cryptocurrency.objects.get(symbol=symbol)
-            add_amount = float('%.2f' %(new_investment.asset.get_usd_value() * quantity))
-            self.amount_invested += add_amount
-            self.current_balance += add_amount
+    def create_superuser(self, email, password, **extra_fields):
+        extra_fields.setdefault('is_superuser', True)
 
-        new_investment.investor = self.user
-        new_investment.date = purchase_date
-        new_investment.purchase_price = price
-        new_investment.quantity = quantity
-        new_investment.save()
-        self.save()
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
 
-    def get_investment(self,symbol):
+        return self._create_user(email, password, **extra_fields)
 
-        if Stock.objects.filter(symbol=symbol):
-            asset = Stock.objects.get(symbol=symbol)
-            if StockInvestment.objects.filter(investor=self.user, asset=asset):
-                return StockInvestment.objects.get(investor=self.user, asset=asset)
-        elif Option.objects.filter(symbol=symbol):
-            asset = Option.objects.get(symbol=symbol)
-            if OptionInvestment.objects.filter(investor=self.user, asset=asset):
-                return OptionInvestment.objects.get(investor=self.user, asset=asset)
-        elif Cryptocurrency.objects.filter(symbol=symbol):
-            asset = Cryptocurrency.objects.get(symbol=symbol)
-            if CryptoInvestment.objects.filter(investor=self.user, asset=asset):
-                return CryptoInvestment.objects.get(investor=self.user, asset=asset)
+class User(AbstractBaseUser):
+    email = models.EmailField(unique=True, null=True)
+    is_staff = models.BooleanField('staff status',default=False,help_text='Is the user allowed to have access to the admin')
+    is_active = models.BooleanField('active',default=True,help_text= 'Is the user account currently active')
+    USERNAME_FIELD = 'email'
+    objects = MyUserManager()
 
-    def get_all_investments(self):
-        investments = []
+    def get_full_name(self):
+        return self.email
 
-        for investment in StockInvestment.objects.filter(investor=self.user):
-            investments.append(investment)
-        for investment in OptionInvestment.objects.filter(investor=self.user):
-            investments.append(investment)
-        for investment in CryptoInvestment.objects.filter(investor=self.user):
-            investments.append(investment)
-        all_investments = {}
-        for investment in investments:
-            if not investment.asset.symbol in investments:
-                all_investments[investment.asset.symbol] = [investment]
-            else:
-                all_investments[investment.asset.symbol].append(investment)
-        return all_investments
+    def get_short_name(self):
+        return self.email
 
-    def update_current_balance(self):
-        balance = 0
-        investments = self.get_all_investments()
-        for key, value in investments.items():
-            for item in value:
-                if Stock.objects.filter(symbol=item.asset.symbol) or Option.objects.filter(symbol=item.asset.symbol):
-                    balance += item.asset.last * item.quantity
-                else:
-                    balance += item.asset.get_usd_value() * item.quantity
+    def __str__(self):
+        return self.email
 
-        if balance != self.current_balance:
-            self.current_balance = balance
-            self.current_balance = '%.2f' %self.current_balance
-            self.save()
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    first_name = models.CharField(max_length=30, blank=True)
+    last_name = models.CharField(max_length=30, blank=True)
 
-    def get_chart(self):
-        return json.loads(self.chart)
+    binance_api_key = models.CharField(max_length=300,default="",blank=True)
+    binance_secret_key = models.CharField(max_length=300,default="",blank=True)
 
-    def update_chart(self):
-        assets = []
-        for asset in StockInvestment.objects.filter(investor=self.user):
-            assets.append(asset)
-        for asset in OptionInvestment.objects.filter(investor=self.user):
-            assets.append(asset)
-        for asset in CryptoInvestment.objects.filter(investor=self.user):
-            assets.append(asset)
+    hitbtc_api_key = models.CharField(max_length=300,default="",blank=True)
+    hitbtc_secret_key = models.CharField(max_length=300,default="",blank=True)
 
-        chart = {}
+    poloniex_api_key = models.CharField(max_length=300,default="",blank=True)
+    poloniex_secret_key = models.CharField(max_length=300,default="",blank=True)
 
-        for asset in assets:
-            asset.update_chart()
-            asset_chart = asset.get_chart()
-            asset_dates = list([str(datetime.datetime.strptime(item['time'],"%Y-%m-%dT%H:%M:%S").date()) for item in asset_chart])
-            for date in asset_dates:
-                price_list = list([float(item["close"]) for item in asset_chart if str(datetime.datetime.strptime(item['time'],"%Y-%m-%dT%H:%M:%S").date()) == date])
-                if not date in chart.keys():
-                    chart[date] = list([item for item in price_list])
-                else:
-                    chart[date] += price_list
+    coinbase_api_key = models.CharField(max_length=300,default="",blank=True)
+    coinbase_secret_key = models.CharField(max_length=300,default="",blank=True)
 
-        for date in chart.keys():
-            if len(chart[date]) > 1:
-                chart[date] = sum(chart[date])/len(chart[date])
-        chart = json.dumps(chart)
-
-        self.chart = chart
-        self.save()
-
-class StockInvestment(models.Model):
-    investor = models.ForeignKey(User, on_delete=models.CASCADE)
-    asset = models.ForeignKey(Stock, on_delete=models.CASCADE)
-    purchase_price = models.FloatField(default = None)
-    quantity = models.FloatField(default = None, null = True)
-    date = models.DateField(default = None)
-    performance = models.FloatField(default = None, null = True)
-    chart = models.TextField(default = None, null = True)
-
-    def get_chart(self):
-        return json.loads(self.chart)
-
-    def update_chart(self):
-        days = (datetime.datetime.now().date() - self.date).days
-        self.chart = tradier.get_candlestick(self.asset.symbol,days)
-        self.save()
-
-    def update_performance(self):
-        self.performance = ((self.asset.bid + self.asset.ask)/2 * self.quantity) - (self.purchase_price * self.quantity)
-        self.save()
-
-
-class OptionInvestment(models.Model):
-    investor = models.ForeignKey(User, on_delete=models.CASCADE)
-    asset = models.ForeignKey(Option, on_delete=models.CASCADE)
-    purchase_price = models.FloatField(default = None)
-    quantity = models.FloatField(default = None, null = True)
-    date = models.DateField(default = None)
-    performance = models.FloatField(default = None, null = True)
-    chart = models.TextField(default = None, null = True)
-
-    def get_chart(self):
-        return json.loads(self.chart)
-
-    def update_chart(self):
-        days = (datetime.datetime.now().date() - self.date).days
-        self.chart = tradier.get_candlestick(self.asset.symbol,days)
-        self.save()
-
-    def update_performance(self):
-        self.performance = ((self.asset.bid + self.asset.ask)/2 * self.quantity) - (self.purchase_price * self.quantity)
-        self.save()
-
-class CryptoInvestment(models.Model):
-    investor = models.ForeignKey(User, on_delete=models.CASCADE)
-    asset = models.ForeignKey(Cryptocurrency, on_delete=models.CASCADE)
-    purchase_price = models.FloatField(default = None)
-    quantity = models.FloatField(default = None, null = True)
-    date = models.DateField(default = None)
-    performance = models.FloatField(default = None, null = True)
-    chart = models.TextField(default = None, null = True)
-
-    def get_chart(self):
-        return json.loads(self.chart)
-
-    def update_chart(self):
-        days = (datetime.datetime.now().date() - self.date).days
-        self.chart = hitbtc.get_candlestick(self.asset.symbol,days)
-        self.save()
-
-    def update_performance(self):
-        self.performance = ((self.asset.bid + self.asset.ask)/2 * self.quantity) - (self.purchase_price * self.quantity)
-        self.save()
+    def __str__(self):
+        return self.first_name[0].upper() + self.first_name[1:] + " " + self.last_name[0].upper() + self.last_name[1:]
