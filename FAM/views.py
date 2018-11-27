@@ -1,5 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from accounts.models import Profile
 
 def home(request):
-    return render(request, 'FAM/base_site/index.html', {"user":request.user})
+    # if request.user.is_authenticated:
+    #     return redirect('dashboard')
+    return render(request, 'FAM/index.html', {"user":request.user})

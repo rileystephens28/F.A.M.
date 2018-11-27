@@ -1,15 +1,16 @@
 import datetime
-import plotly.offline as opy
-import plotly.graph_objs as go
+import json
 from threading import Thread
 from django.shortcuts import render, redirect
 from django.contrib.auth import login,logout,authenticate
-from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from .models import Profile
-from .forms import SignupForm, LoginForm
+from django.http import JsonResponse
+from django.db.models import F
+from .models import User, Profile, Balance
+from .forms import SignupForm, LoginForm, ApiKeyForm
 
 def signup_view(request):
+    """ authenticates user if post request, otherwise returns signup.html"""
     if request.method == 'POST':
         form = SignupForm(data = request.POST)
         if form.is_valid():
@@ -17,32 +18,73 @@ def signup_view(request):
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(email=user.email, password=raw_password)
             login(request, user)
-            profile = Profile()
-            profile.user = user
-            profile.save()
-            return redirect('home')
+            return redirect('dashboard')
     else:
         form = SignupForm()
 
-    return render(request, 'accounts/base_site/signup.html', {'form': form})
+    return render(request, 'accounts/signup.html', {'form': form})
 
 def login_view(request):
     if request.method == "POST":
-        form = LoginForm(data = request.POST)
+        form = LoginForm(data=request.POST)
         if form.is_valid():
-            user_id= form.get_user_id()
-            user = auth.get_user()
+            user = authenticate(username=form.cleaned_data.get('username'), password=form.cleaned_data.get('password'))
             login(request, user)
-            return redirect('home')
+            return redirect('dashboard')
         else:
             form = LoginForm()
     else:
         form = LoginForm()
-    return render(request, 'accounts/base_site/login.html', {'form': form})
+    return render(request, 'accounts/login.html', {'form': form})
 
+@login_required(login_url="/account/login/")
 def logout_view(request):
     logout(request)
     return redirect('home')
+
+@login_required(login_url="/account/login/")
+def dashboard_view(request):
+    user = User.objects.get(email=request.user.email)
+    Thread(target=user.profile.total_balance).start()
+    balances = list(Balance.objects.filter(user=user).order_by('-amount'))[:5]
+    print(balances)
+    return render(request, 'accounts/dashboard.html',{'balances':balances})
+
+@login_required(login_url="/account/login/")
+def profile_view(request):
+    user = User.objects.get(email=request.user.email)
+    if request.method == "POST":
+        form = ApiKeyForm(data=request.POST)
+        if form.is_valid():
+            exchange = str(form.cleaned_data.get('exchange'))
+            api_key = str(form.cleaned_data.get('api_key'))
+            secret_key = str(form.cleaned_data.get('secret_key'))
+            if exchange == "Binance":
+                user.profile.binance_api_key = api_key
+                user.profile.binance_secret_key = secret_key
+            elif exchange == "Poloniex":
+                user.profile.poloniex_api_key = api_key
+                user.profile.poloniex_secret_key = secret_key
+            elif exchange == "Coinbase":
+                user.profile.coinbase_api_key = api_key
+                user.profile.coinbase_secret_key = secret_key
+            elif exchange == "HitBTC":
+                user.profile.hitbtc_api_key = api_key
+                user.profile.hitbtc_secret_key = secret_key
+            user.profile.save()
+            return redirect('profile')
+        else:
+            form = ApiKeyForm()
+    else:
+        form = ApiKeyForm()
+
+    return render(request, 'accounts/profile.html',{'user': user,'form': form})
+
+def get_graph(request):
+
+    response = JsonResponse(dict())
+    # response = JsonResponse(dict(assets=list(Asset.objects.filter(balance__gt = 0).order_by('-balance').values('symbol','base','quote','price','balance','entry'))))
+    return response
 
 @login_required(login_url="/account/login/")
 def investment_view(request):

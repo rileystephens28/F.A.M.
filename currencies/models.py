@@ -8,6 +8,9 @@ class Currency(models.Model):
     symbol = models.CharField(max_length=10)    # what exchange calls coin
     name = models.CharField(max_length=10)      # what we will can coin (EX: USDT is named USD)
 
+    def __str__(self):
+        return self.symbol
+
 class CurrencyPair(models.Model):
 
     base = models.ForeignKey(Currency, on_delete=models.CASCADE,related_name="base")
@@ -20,25 +23,8 @@ class CurrencyPair(models.Model):
     base_volume = models.FloatField(default=None, null=True)
     quote_volume = models.FloatField(default=None, null=True)
 
-    day_chart = models.TextField(default = None, null = True)
-    week_chart = models.TextField(default = None, null = True)
-    month_chart = models.TextField(default = None, null = True)
-    year_chart = models.TextField(default = None, null = True)
-
-    def get_day_chart(self):
-        return loads(self.day_chart)
-
-    def get_week_chart(self):
-        return loads(self.week_chart)
-
-    def get_month_chart(self):
-        return loads(self.month_chart)
-
-    def get_year_chart(self):
-        return loads(self.year_chart)
-
     def get_quote_value(self,quote_currency):  # implement by looking at last price of quote_currency (USD) and calulating holdings
         pass
 
     def __str__(self):
-        return self.symbol
+        return self.base.symbol+" "+self.quote.symbol

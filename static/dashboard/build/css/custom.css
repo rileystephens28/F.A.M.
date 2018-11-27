@@ -144,7 +144,11 @@ html , body{
     padding: 0 0 4px 0
 }
 .left_col {
-    background: #2A3F54
+  background: #b5ddcc; /* Old browsers */
+  background: -moz-linear-gradient(-45deg, #b5ddcc 0%, #83c7aa 0%, #52b288 6%, #52b288 24%, #005832 76%, #002414 100%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(-45deg, #b5ddcc 0%,#83c7aa 0%,#52b288 6%,#52b288 24%,#005832 76%,#002414 100%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(135deg, #b5ddcc 0%,#83c7aa 0%,#52b288 6%,#52b288 24%,#005832 76%,#002414 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b5ddcc', endColorstr='#002414',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
 }
 .nav-sm .container.body .col-md-3.left_col {
     min-height: 100%;
@@ -334,13 +338,15 @@ html , body{
     }
 }
 .nav-md .container.body .col-md-3.left_col {
-    min-height: 100%;
+    height: 100%;
     width: 230px;
     padding: 0;
-    position: absolute;
-    display: -ms-flexbox;
     display: flex;
-    z-index: 1
+    z-index: 1;
+    position: fixed;
+    overflow-y: scroll;
+    top: 0;
+    bottom: 0;
 }
 .nav-md .container.body .col-md-3.left_col.menu_fixed {
     height: 100%;
@@ -356,7 +362,7 @@ body .container.body .right_col {
 .nav_title {
     width: 230px;
     float: left;
-    background: #2A3F54;
+    /* background: #03623C; */
     border-radius: 0;
     height: 57px
 }
@@ -471,8 +477,13 @@ body .container.body .right_col {
     color: #fff
 }
 .container {
-    width: 100%;
-    padding: 0
+  width: 100%;
+  padding: 0;
+  position: fixed;
+  overflow-y: scroll;
+  top: 0;
+  bottom: 0;
+  height: 100%;
 }
 .navbar-nav>li>a,
 .navbar-brand,
@@ -487,8 +498,9 @@ body .container.body .right_col {
     background: #D9DEE4
 }
 body {
-    color: #73879C;
-    background: #2A3F54;
+    /* color: #73879C; */
+    color: black;
+    /* background: #2A3F54; */
     font-family: "Helvetica Neue", Roboto, Arial, "Droid Sans", sans-serif;
     font-size: 13px;
     font-weight: 400;
@@ -879,7 +891,7 @@ a:focus {
 }
 .panel_toolbox {
     float: right;
-    min-width: 70px
+    min-width: 0px
 }
 .panel_toolbox>li {
     float: left;
@@ -1090,6 +1102,7 @@ h2 {
     padding: 0 5px 6px;
     position: relative;
     width: 100%;
+    height: 20%;
     float: left;
     clear: both;
     margin-top: 5px
@@ -1639,6 +1652,9 @@ ul.quick-list li i {
 }
 .w_25 {
     width: 25%
+}
+.w_35 {
+    width: 35%
 }
 .w_55 {
     width: 55%
