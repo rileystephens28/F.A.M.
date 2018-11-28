@@ -301,13 +301,13 @@ class BinanceWebsocket(WebSocket):
                 self.reconnect()
 
     def process_ticker(self,msg):
-        bid = float("%.2f"%float(msg["b"]))
-        ask = float("%.2f"%float(msg["a"]))
-        last = float("%.2f"%float(msg["c"]))
-        base_volume = float("%.2f"%float(msg["v"]))
-        quote_volume = float("%.2f"%float(msg["q"]))
+        bid = float(msg["b"])
+        ask = float(msg["a"])
+        last = float(msg["c"])
+        base_volume = float(msg["v"])
+        quote_volume = float(msg["q"])
         CurrencyPair.objects.filter(symbol=msg["s"],base__exchange=self.exchange).update(bid=bid,ask=ask,last=last,base_volume=base_volume,quote_volume=quote_volume)
-        print("binance  ", msg["s"],last)
+        # print("binance  ", msg["s"],last)
 
 
 #-------------------

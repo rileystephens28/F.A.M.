@@ -46,32 +46,13 @@
   	    </div>
 
   	   	<nav id="header-nav-wrap">
-  			<ul class="header-main-nav">
-
-         <li><a class="smoothscroll"  href="#about" title="About">About</a></li>
-
-  				<li><a class="smoothscroll"  href="#testimonials" title="trending">Trending</a></li>
-          <a href= {% url "signup" %} class="button button-primary cta">Sign Up</a>
-          <a href= {% url "login" %} class="button button-primary cta">Login</a>
-
-
-              <!-- <a href="signup.html" title="sign-up" class="button button-primary cta">Sign In</a> -->
-              <!-- {% if user.is_authenticated %}
-
-              <div class="dropdown">
-                <li><a><img src={% static "base_site/images/user.png" %} style="width:40px; height:50px;padding-top:10px"></a></li>
-                  <div class="dropdown-content">
-                    <a href= {% url "logout" %} title="account">Sign out</a>
-                  </div>
-
-              </div>
-            </ul>
-              {% else %}
-                <a href= {% url "signup" %} class="button button-primary cta">Sign Up</a>
-                <a href= {% url "login" %} class="button button-primary cta">Login</a>
-              {% endif %}
-              <div class="dropdown-content"></div> -->
-  		</nav>
+    			<ul class="header-main-nav">
+           <li><a class="smoothscroll"  href="#about" title="About">About</a></li>
+    				<li><a class="smoothscroll"  href="#testimonials" title="trending">Trending</a></li>
+            <a href= {% url "signup" %} class="button button-primary cta">Sign Up</a>
+            <a href= {% url "login" %} class="button button-primary cta">Login</a>
+          </ul>
+  		   </nav>
 
   		<a class="header-menu-toggle" href="#"><span>Menu</span></a>
 
@@ -91,8 +72,7 @@
            <div class="col-twelve">
              <div class="copyright">
                <span>© Copyright FAM 2018.</span>
-               <!-- <span>Design by <a href="http://www.styleshout.com/"></a></span> -->
-              </div>
+             </div>
 
               <div id="go-top">
                  <a class="smoothscroll" title="Back to Top" href="#top"><i class="icon-arrow-up"></i></a>

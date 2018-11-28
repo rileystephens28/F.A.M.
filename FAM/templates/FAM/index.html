@@ -15,7 +15,7 @@
                 <div class="home-content-left">
 
                     <h1 data-aos="fade-up">
-                        Financial Asset Management <br> 
+                        Financial Asset Management <br>
                         ~ Made Easy ~<br>
                     </h1>
 
@@ -29,14 +29,7 @@
                             Login
                         </a>
                     </div>
-
                 </div>
-
-                <!-- <div class="home-image-right">
-                    <img src="images/iphone-app-470.png"
-                        srcset="images/iphone-app-470.png 1x, images/iphone-app-940.png 2x"
-                        data-aos="fade-up">
-                </div> -->
             </div>
 
         </div> <!-- end home-content -->
@@ -78,7 +71,9 @@
             </div>
             <div class="col-eight">
                 <p class="lead" data-aos="fade-up">
-                  FAM challenges the complicated status quo of investment tracking by providing users with the ability to track their assets in one place. Create your secure account, effortlessly manage your portfolio, and track cross-market investments; Join the FAM today.
+                  FAM is a financial asset management system that aims to automate cryptocurrency
+                  portfolio performance tracking.  Create your secure account,
+                  effortlessly manage your portfolio, and track cross-exchange investments. Join the FAM today.
                  </p>
             </div>
 
@@ -94,14 +89,16 @@
 
                     <div class="service-content">
 
-                        <h3>Cross-Market Investment Tracking</h3>
+                        <h3>API</h3>
 
-                        <p>With FAM, anyone can create a portfolio that tracks the most popular assets, stocks, options, and cryptocurrencies, in one place. Live data is used to accurately and efficiently monitor the performance of investments over-time.
+                        <p>With FAM, APIs are responsible for pulling real time market data and user investments to make sure
+                          investors are getting time accurate cryptocurrency prices. FAM simplifies investment tracking by automatically
+                           pulling in investors trades from their exchange account.
                         </p>
 
                     </div>
 
-                    </div> <!-- /bgrid -->
+                    </div>
 
                     <div class="bgrid feature" data-aos="fade-up">
 
@@ -110,7 +107,8 @@
                     <div class="service-content">
 
                         <h3>Security</h3>
-                        <p>We value keeping your investment information private as much as you do. F.A.M ensures the security of users’ investment information by using the django authentication system. Your assets will be accessed and managed by you and secured by us.
+                        <p>We value keeping your investment information private as much as you do.
+                          FAM ensures the security of users’ investment information by using CSRF tokens and encrypting all of your data. Your assets will be accessed and managed by you and secured by us.
                         </p>
 
                     </div>
@@ -122,14 +120,15 @@
                     <span class="icon"><i class="icon-window"></i></span>
 
                     <div class="service-content">
-                        <h3>Flexibility</h3>
+                        <h3>Cross-Exchange Tracking</h3>
 
-                        <p>F.A.M. allows users to effortlessly manage and track their assets by providing an up to date balance and overview of their entire portfolio. Users can add and delete assets to see how they affect their overall performance without the fear of altering their actual holdings. The flexibility of F.A.M. provides a platform to test and analyze potential future investments.
+                        <p>With cryptocurrencies often appearing across various exchanges, it becomes difficult
+                           to track all holdings. In addition to simply tracking portfolio performance, FAM
+                           will be able to generate a profit/loss sheet for investors to use for filing taxes.
                         </p>
 
                     </div>
-
-                </div> <!-- /bgrid -->
+                </div>
 
 
 
@@ -153,44 +152,25 @@
             <div id="testimonial-slider"  data-aos="fade-up">
 
                 <div class="slides owl-carousel">
-
                     <div>
-                        <p>
-                        Insert chart
-                        </p>
-
-                        <div class="testimonial-author">
-                                <img src= {% static "base_site/images/appleLogo.png" %} alt="Author image">
-                                <div class="author-info">
-                                    Apple Inc.
-                                </div>
-                        </div>
+                      <div class="testimonial-author">
+                        <img src= {% static "base_site/images/bitcoinLogo.png" %} alt="Author image">
+                        <div class="author-info">Bitcoin</div>
+                      </div>
                     </div>
 
                     <div>
-                        <p>
-                        insert chart
-                        </p>
-
-                        <div class="testimonial-author">
-                                <img src= {% static "base_site/images/bitcoinLogo.png" %} alt="Author image">
-                                <div class="author-info">
-                                    Bitcoin
-                                </div>
-                        </div>
+                      <div class="testimonial-author">
+                        <img src= {% static "base_site/images/ripple.jpg" %} alt="Author image">
+                        <div class="author-info">Ripple</div>
+                      </div>
                     </div>
 
                     <div>
-                        <p>
-                        Insert Chart
-                        </p>
-
-                        <div class="testimonial-author">
-                                <img src= {% static "base_site/images/amazonLogo.jpg" %} alt="Author image">
-                                <div class="author-info">
-                                    Amazon.com, inc
-                                </div>
-                        </div>
+                      <div class="testimonial-author">
+                        <img src= {% static "base_site/images/ethereumLogo.jpg" %} alt="Author image">
+                        <div class="author-info">Ethereum</div>
+                      </div>
                     </div>
 
                 </div> <!-- end slides -->

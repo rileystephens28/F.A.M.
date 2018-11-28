@@ -184,14 +184,14 @@ class HitbtcWebsocket(WebSocket):
             time.sleep(.3)
 
     def process_ticker(self,msg):
-        bid = float("%.2f"%float(msg['params']['bid']))
-        ask = float("%.2f"%float(msg['params']['ask']))
-        last = float("%.2f"%float(msg['params']['last']))
-        base_volume = float("%.2f"%float(msg['params']['volume']))
-        quote_volume = float("%.2f"%float(msg['params']['volumeQuote']))
+        bid = float(msg['params']['bid'])
+        ask = float(msg['params']['ask'])
+        last = float(msg['params']['last'])
+        base_volume = float(msg['params']['volume'])
+        quote_volume = float(msg['params']['volumeQuote'])
         CurrencyPair.objects.filter(symbol=msg['params']['symbol'],base__exchange=self.exchange).update(bid=bid,ask=ask,last=last,base_volume=base_volume,quote_volume=quote_volume)
         connection.close()
-        print("hitbtc  ", msg['params']['symbol'], last)
+        # print("hitbtc  ", msg['params']['symbol'], last)
 
 
 

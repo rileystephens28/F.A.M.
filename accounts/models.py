@@ -109,20 +109,23 @@ class Profile(models.Model):
             get_trades_from_exchange()
 
     def total_balance(self):
-        def assign_balance():
-            balances = manager.get_balances(exchange)
+        def assign_balance(_exchange):
+            balances = manager.get_balances(_exchange.name.lower())
             for balance in balances:
                 if balance['tradable'] > 0:
-                    currency = Currency.objects.get(symbol=balance["asset"], exchange=exchange_obj)
-                    if not Balance.objects.filter(currency=currency,exchange=exchange_obj,user=self.user).exists():
-                        new_balance = Balance()
-                        new_balance.user = self.user
-                        new_balance.currency = currency
-                        new_balance.exchange = exchange_obj
-                        new_balance.value = balance['tradable']
-                        new_balance.save()
-                    else:
-                        Balance.objects.filter(currency=currency,exchange=exchange_obj,user=self.user).update(amount=balance["tradable"])
+                    try:
+                        currency = Currency.objects.get(symbol=balance["asset"], exchange=exchange_obj)
+                        if not Balance.objects.filter(currency=currency,exchange=exchange_obj,user=self.user).exists():
+                            new_balance = Balance()
+                            new_balance.user = self.user
+                            new_balance.currency = currency
+                            new_balance.exchange = exchange_obj
+                            new_balance.value = balance['tradable']
+                            new_balance.save()
+                        else:
+                            Balance.objects.filter(currency=currency,exchange=exchange_obj,user=self.user).update(amount=balance["tradable"])
+                    except:
+                        pass
 
         exchanges = {}
         if self.binance_api_key:
@@ -136,7 +139,6 @@ class Profile(models.Model):
         for exchange in exchanges.keys():
             exchange_obj = Exchange.objects.get(name__iexact=exchange)
             Thread(target=assign_balance).start()
-        print("done")
 
 
 class Trade(models.Model):
@@ -146,6 +148,8 @@ class Trade(models.Model):
     price = models.FloatField(default=0)
     type = models.CharField(max_length=10,default="")
     time = models.DateTimeField(default=None,null=True)
+    usd_value = models.FloatField(default=0)
+
 
 class Balance(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -154,35 +158,14 @@ class Balance(models.Model):
     amount = models.FloatField(default=0)
     usd_value = models.FloatField(default=0)
 
-    def get_usd_value(self):
-        if self.currency.name != "USD":
-            if CurrencyPair.objects.filter(symbol=self.currency.symbol+"USDC",base__exchange=self.exchange).exists():
-                price = CurrencyPair.objects.get(symbol=self.currency.symbol+"USDC",base__exchange=self.exchange).last
-            elif CurrencyPair.objects.filter(symbol=self.currency.symbol+"USDT",base__exchange=self.exchange).exists():
-                price = CurrencyPair.objects.get(symbol=self.currency.symbol+"USDT",base__exchange=self.exchange).last
-            elif CurrencyPair.objects.filter(symbol=self.currency.symbol+"USD",base__exchange=self.exchange).exists():
-                price = CurrencyPair.objects.get(symbol=self.currency.symbol+"USD",base__exchange=self.exchange).last
-            elif CurrencyPair.objects.filter(symbol=self.currency.symbol+"BTC",base__exchange=self.exchange).exists():
-                btc_pair = CurrencyPair.objects.get(symbol=self.currency.symbol+"BTC",base__exchange=self.exchange).last
-                if CurrencyPair.objects.filter(symbol="BTCUSDC",base__exchange=self.exchange).exists():
-                    btc_usd = CurrencyPair.objects.get(symbol="BTCUSDC",base__exchange=self.exchange).last
-                elif CurrencyPair.objects.filter(symbol="BTCUSDT",base__exchange=self.exchange).exists():
-                    btc_usd = CurrencyPair.objects.get(symbol="BTCUSDT",base__exchange=self.exchange).last
-                elif CurrencyPair.objects.filter(symbol="BTCUSD",base__exchange=self.exchange).exists():
-                    btc_usd = CurrencyPair.objects.get(symbol="BTCUSD",base__exchange=self.exchange).last
-                price = btc_pair*btc_usd
-
-            print(self.exchange,self.currency.name)
-            self.usd_value = float("%.2f"%(self.amount * price))
-        else:
-            self.usd_value = float("%.2f"%(self.amount))
-        print(self.usd_value)
-        self.save()
-
-
 @receiver(post_save, sender=User)
 def my_callback(instance, *args, **kwargs):
     if not Profile.objects.filter(user=instance).exists():
         profile = Profile()
         profile.user = instance
         profile.save()
+
+@receiver(post_save, sender=Balance)
+def my_callback(instance, *args, **kwargs):
+    instance.usd_value = instance.currency.get_usd_value() * instance.amount
+    instance.save()

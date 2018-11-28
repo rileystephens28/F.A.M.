@@ -8,6 +8,33 @@ class Currency(models.Model):
     symbol = models.CharField(max_length=10)    # what exchange calls coin
     name = models.CharField(max_length=10)      # what we will can coin (EX: USDT is named USD)
 
+    def get_usd_value(self):
+        if self.name != "USD":
+            if CurrencyPair.objects.filter(symbol=self.symbol+"USDT",base__exchange=self.exchange).exists():
+                pair = CurrencyPair.objects.get(symbol=self.symbol+"USDT",base__exchange=self.exchange)
+                price = pair.last
+            elif CurrencyPair.objects.filter(symbol=self.symbol+"USDC",base__exchange=self.exchange).exists():
+                pair = CurrencyPair.objects.get(symbol=self.symbol+"USDC",base__exchange=self.exchange)
+                price = pair.last
+            elif CurrencyPair.objects.filter(symbol=self.symbol+"USD",base__exchange=self.exchange).exists():
+                pair = CurrencyPair.objects.get(symbol=self.symbol+"USD",base__exchange=self.exchange)
+                price = pair.last
+            elif CurrencyPair.objects.filter(symbol=self.symbol+"BTC",base__exchange=self.exchange).exists():
+                btc_pair = CurrencyPair.objects.get(symbol=self.symbol+"BTC",base__exchange=self.exchange)
+                if CurrencyPair.objects.filter(symbol="BTCUSDT",base__exchange=self.exchange).exists():
+                    btc_usd = CurrencyPair.objects.get(symbol="BTCUSDT",base__exchange=self.exchange)
+                elif CurrencyPair.objects.filter(symbol="BTCUSDC",base__exchange=self.exchange).exists():
+                    btc_usd = CurrencyPair.objects.get(symbol="BTCUSDC",base__exchange=self.exchange)
+                elif CurrencyPair.objects.filter(symbol="BTCUSD",base__exchange=self.exchange).exists():
+                    btc_usd = CurrencyPair.objects.get(symbol="BTCUSD",base__exchange=self.exchange)
+                price = btc_pair.last*btc_usd.last
+            else:
+                price = 0
+        else:
+            price = 1
+
+        return price
+
     def __str__(self):
         return self.symbol
 
@@ -23,9 +50,6 @@ class CurrencyPair(models.Model):
 
     base_volume = models.FloatField(default=0)
     quote_volume = models.FloatField(default=0)
-
-    def get_quote_value(self,quote_currency):  # implement by looking at last price of quote_currency (USD) and calulating holdings
-        pass
 
     def __str__(self):
         return self.base.symbol+" "+self.quote.symbol

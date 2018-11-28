@@ -16,27 +16,29 @@ symbols = [item.currency for item in Balance.objects.all() if item.currency.symb
 
 stream_symbols = []
 for symbol in symbols:
-    if Currency.objects.filter(symbol="USDC",exchange=symbol.exchange).exists():
-        usd = Currency.objects.get(symbol="USDC",exchange=symbol.exchange)
-    elif Currency.objects.filter(symbol="USDT",exchange=symbol.exchange).exists():
-        usd = Currency.objects.get(symbol="USDT",exchange=symbol.exchange)
-    elif Currency.objects.filter(symbol="USD",exchange=symbol.exchange):
-        usd = Currency.objects.get(symbol="USD",exchange=symbol.exchange)
+    if CurrencyPair.objects.filter(symbol=symbol.symbol+"USDC",base__exchange=symbol.exchange).exists():
+        stream_symbols.append(CurrencyPair.objects.get(symbol=symbol.symbol+"USDC",base__exchange=symbol.exchange).symbol)
+    if CurrencyPair.objects.filter(symbol=symbol.symbol+"USDT",base__exchange=symbol.exchange).exists():
+        stream_symbols.append(CurrencyPair.objects.get(symbol=symbol.symbol+"USDT",base__exchange=symbol.exchange).symbol)
+    if CurrencyPair.objects.filter(symbol=symbol.symbol+"USD",base__exchange=symbol.exchange).exists():
+        stream_symbols.append(CurrencyPair.objects.get(symbol=symbol.symbol+"USD",base__exchange=symbol.exchange).symbol)
+    if CurrencyPair.objects.filter(symbol=symbol.symbol+"BTC",base__exchange=symbol.exchange).exists():
+        stream_symbols.append(CurrencyPair.objects.get(symbol=symbol.symbol+"BTC",base__exchange=symbol.exchange).symbol)
+    if CurrencyPair.objects.filter(symbol="BTCUSDT",base__exchange=symbol.exchange).exists():
+        stream_symbols.append(CurrencyPair.objects.get(symbol="BTCUSDT",base__exchange=symbol.exchange).symbol)
+    elif CurrencyPair.objects.filter(symbol="BTCUSDC",base__exchange=symbol.exchange).exists():
+        stream_symbols.append(CurrencyPair.objects.get(symbol="BTCUSDC",base__exchange=symbol.exchange).symbol)
+    elif CurrencyPair.objects.filter(symbol="BTCUSD",base__exchange=symbol.exchange).exists():
+        stream_symbols.append(CurrencyPair.objects.get(symbol="BTCUSD",base__exchange=symbol.exchange).symbol)
 
-    if CurrencyPair.objects.filter(base=symbol,quote=usd).exists():
-        stream_symbols.append(symbol.symbol+usd.symbol)
 
-    if CurrencyPair.objects.filter(base=symbol,quote__symbol="BTC").exists():
-        stream_symbols.append(symbol.symbol+"BTC")
+# stream_symbols.append('BTCUSD')
+# stream_symbols.append('BTCUSDC')
+# stream_symbols.append('BTCUSDT')
+# stream_symbols.append('ETHUSD')
 
-    if Currency.objects.filter(symbol="USDC",exchange=symbol.exchange).exists():
-        usd = Currency.objects.get(symbol="USDC",exchange=symbol.exchange)
-
-
-stream_symbols.append('BTCUSD')
-stream_symbols.append('BTCUSDC')
-stream_symbols.append('BTCUSDT')
-stream_symbols.append('ETHUSD')
-
+stream_symbols = list(set(stream_symbols))
+for sym in stream_symbols:
+    print(sym)
 manager = WebSocketMananger(list(set(stream_symbols)))
 manager.start()

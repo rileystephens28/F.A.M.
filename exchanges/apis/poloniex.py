@@ -40,7 +40,7 @@ class PoloniexClient:
         self._secret = secret_key
         self.session = requests.Session()
         self.nonce_lock = nonce_lock or threading.RLock()
-        self.nonce_iter = nonce_iter or itertools.count(int(time.time() * 1000000))
+        self.nonce_iter = nonce_iter or itertools.count(int(time.time() * 1000000000))
 
     def _public(self, command, **params):
         """Invoke the 'command' public API with optional params."""
@@ -227,14 +227,15 @@ class PoloniexWebsocket(WebSocket):
             quote = symbol.split("_")[0]
             currency_pair = base + quote
             if currency_pair in self.symbols:
-                bid = float("%.2f"%float(msg[2][3]))
-                ask = float("%.2f"%float(msg[2][2]))
-                last = float("%.2f"%float(msg[2][1]))
-                base_volume = float("%.2f"%float(msg[2][5]))
-                quote_volume = float("%.2f"%float(msg[2][6]))
+                # print(msg)
+                bid = float(msg[2][3])
+                ask = float(msg[2][2])
+                last = float(msg[2][1])
+                base_volume = float(msg[2][5])
+                quote_volume = float(msg[2][6])
                 CurrencyPair.objects.filter(symbol=currency_pair,base__exchange=self.exchange).update(bid=bid,ask=ask,last=last,base_volume=base_volume,quote_volume=quote_volume)
                 connection.close()
-                print("poloniex  ", currency_pair, last) # save to database here
+                # print("poloniex  ", currency_pair, last) # save to database here
 
 
 #-------------------

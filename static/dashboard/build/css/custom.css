@@ -959,7 +959,7 @@ footer {
     margin-bottom: 0
 }
 .tile {
-    overflow: hidden
+    overflow: scroll;
 }
 .top_tiles {
     margin-bottom: 0
@@ -1089,7 +1089,7 @@ h2 {
     float: left;
     display: block;
     text-overflow: ellipsis;
-    overflow: hidden;
+    /* overflow: hidden; */
     white-space: nowrap
 }
 .x_title h2 small {
@@ -1645,7 +1645,7 @@ ul.quick-list li i {
     text-align: right
 }
 .widget_summary .w_right span {
-    font-size: 20px
+    /* font-size: 20px */
 }
 .w_20 {
     width: 20%

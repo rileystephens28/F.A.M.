@@ -190,9 +190,7 @@
 		ssPlaceholder();
 		ssAlertBoxes();
 		ssAOS();
-		ssAjaxChimp();
-		ssBackToTop();
-
+		
 	})();
 
 

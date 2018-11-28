@@ -19,16 +19,8 @@
         <link rel="stylesheet" href={% static "dashboard/vendors/bootstrap/dist/css/bootstrap.min.css" %}>
         <!-- Font Awesome -->
         <link rel="stylesheet" href={% static "dashboard/vendors/font-awesome/css/font-awesome.min.css" %}>
-        <!-- NProgress -->
-        <link rel="stylesheet" href={% static "dashboard/vendors/nprogress/nprogress.css" %}>
-        <!-- bootstrap-daterangepicker -->
-        <link rel="stylesheet" href={% static "dashboard/vendors/bootstrap-daterangepicker/daterangepicker.css" %}>
-        <!-- iCheck -->
-        <link rel="stylesheet" href={% static "dashboard/vendors/iCheck/skins/flat/green.css" %}>
         <!-- bootstrap-progressbar -->
         <link rel="stylesheet" href={% static "dashboard/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" %}>
-        <!-- JQVMap -->
-        <link rel="stylesheet" href={% static "dashboard/vendors/jqvmap/dist/jqvmap.min.css" %}>
       {% endblock stylesheets %}
       <!-- Custom Theme Style -->
       <link rel="stylesheet" href={% static "dashboard/build/css/custom.css" %}>
@@ -54,7 +46,7 @@
                   <div class="menu_section active">
                     <ul class="nav side-menu">
                       <li><a href={% url "dashboard" %}><i class="fa fa-bar-chart-o"></i> Dashboard</a></li>
-                      <li><a><i class="fa fa-edit"></i> Tax Documents</a></li>
+                      <li><a href={% url "tax_docs" %}><i class="fa fa-edit"></i> Tax Documents</a></li>
                       <li><a href={% url "profile" %}><i class="fa fa-user"></i> Profile</a></li>
                     </ul>
                   </div>
@@ -80,16 +72,6 @@
               </div>
             </div>
 
-            <div class="top_nav">
-              <div class="nav_menu">
-                <nav>
-                  <div class="nav toggle">
-                    <a id="menu_toggle"><i class="fa fa-bars"></i></a>
-                  </div>
-                </nav>
-              </div>
-            </div>
-
           {% block content %}
           {% endblock content %}
         </div>
@@ -100,35 +82,8 @@
         <script src={% static "dashboard/vendors/jquery/dist/jquery.min.js" %}></script>
         <!-- Bootstrap -->
         <script src={% static "dashboard/vendors/bootstrap/dist/js/bootstrap.min.js" %}></script>
-        <!-- FastClick -->
-        <script src={% static "dashboard/vendors/fastclick/lib/fastclick.js" %}></script>
-        <!-- NProgress -->
-        <script src={% static "dashboard/vendors/nprogress/nprogress.js" %}></script>
         <!-- bootstrap-progressbar -->
         <script src={% static "dashboard/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js" %}></script>
-        <!-- iCheck -->
-        <script src={% static "dashboard/vendors/iCheck/icheck.min.js" %}></script>
-        <!-- bootstrap-daterangepicker -->
-        <script src={% static "dashboard/vendors/moment/min/moment.min.js" %}></script>
-        <script src={% static "dashboard/vendors/bootstrap-daterangepicker/daterangepicker.js" %}></script>
-        <!-- bootstrap-wysiwyg -->
-        <script src={% static "dashboard/vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js" %}></script>
-        <script src={% static "dashboard/vendors/jquery.hotkeys/jquery.hotkeys.js" %}></script>
-        <script src={% static "dashboard/vendors/google-code-prettify/src/prettify.js" %}></script>
-        <!-- jQuery Tags Input -->
-        <script src={% static "dashboard/vendors/jquery.tagsinput/src/jquery.tagsinput.js" %}></script>
-        <!-- Switchery -->
-        <script src={% static "dashboard/vendors/switchery/dist/switchery.min.js" %}></script>
-        <!-- Select2 -->
-        <script src={% static "dashboard/vendors/select2/dist/js/select2.full.min.js" %}></script>
-        <!-- Parsley -->
-        <script src={% static "dashboard/vendors/parsleyjs/dist/parsley.min.js" %}></script>
-        <!-- Autosize -->
-        <script src={% static "dashboard/vendors/autosize/dist/autosize.min.js" %}></script>
-        <!-- jQuery autocomplete -->
-        <script src={% static "dashboard/vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js" %}></script>
-        <!-- starrr -->
-        <script src={% static "dashboard/vendors/starrr/dist/starrr.js" %}></script>
       {% endblock %}
       <!-- Custom Theme Scripts -->
       <script src={% static "dashboard/build/js/custom.js" %}></script>
