@@ -4,11 +4,14 @@ import requests
 import six
 import time
 import sys
+import json
 from threading import Thread
 from datetime import datetime, timedelta, date
-from exchanges.apis.websocket_utils import WebSocket, StreamingError
-import json
 from urllib.parse import urlencode
+from django.db import connection, connections
+from exchanges.models import Exchange
+from currencies.models import Currency, CurrencyPair
+from exchanges.apis.websocket_utils import WebSocket, StreamingError
 
 class BinanceClient:
 
@@ -276,11 +279,12 @@ class BinanceClient:
 
 class BinanceWebsocket(WebSocket):
 
-    def __init__(self):
+    def __init__(self, symbols):
         symbols = list([item.lower()+"@ticker" for item in symbols])
-        symbols = ",".join(symbols)
+        symbols = "/".join(symbols)
         self.url = 'wss://stream.binance.com:9443/ws/'+symbols
         self.symbols = symbols
+        self.exchange = Exchange.objects.get(name="Binance")
         super().__init__()
 
     def start(self):
@@ -297,7 +301,13 @@ class BinanceWebsocket(WebSocket):
                 self.reconnect()
 
     def process_ticker(self,msg):
-        print(msg['c'])
+        bid = float("%.2f"%float(msg["b"]))
+        ask = float("%.2f"%float(msg["a"]))
+        last = float("%.2f"%float(msg["c"]))
+        base_volume = float("%.2f"%float(msg["v"]))
+        quote_volume = float("%.2f"%float(msg["q"]))
+        CurrencyPair.objects.filter(symbol=msg["s"],base__exchange=self.exchange).update(bid=bid,ask=ask,last=last,base_volume=base_volume,quote_volume=quote_volume)
+        print("binance  ", msg["s"],last)
 
 
 #-------------------

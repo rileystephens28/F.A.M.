@@ -1,6 +1,7 @@
-from exchanges.apis.poloniex import PoloniexClient
-from exchanges.apis.hitbtc import HitbtcClient
-from exchanges.apis.binance import BinanceClient
+from exchanges.apis.poloniex import PoloniexClient, PoloniexWebsocket
+from exchanges.apis.hitbtc import HitbtcClient, HitbtcWebsocket
+from exchanges.apis.binance import BinanceClient, BinanceWebsocket
+from threading import Thread
 
 class ClientManager:
 
@@ -47,3 +48,8 @@ class WebSocketMananger:
         self.poloniex = PoloniexWebsocket(symbols)
         self.hitbtc = HitbtcWebsocket(symbols)
         self.binance = BinanceWebsocket(symbols)
+
+    def start(self):
+        Thread(target=self.poloniex.start).start()
+        Thread(target=self.binance.start).start()
+        Thread(target=self.hitbtc.start).start()

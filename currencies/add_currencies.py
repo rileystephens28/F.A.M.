@@ -19,6 +19,7 @@ keys={'binance':{'api_key':'DoISpHGHMG6HsH3q57LmgntGO7TVMYIayzjr2DEaEPaofx4VWbao
 
 client = ClientManager(**keys)
 for exchange in exchanges:
+    print(exchange)
     exchange = Exchange.objects.get(name=exchange)
     currencies = client.get_currencies(exchange.name.lower())
     for currency in currencies:
@@ -39,7 +40,10 @@ for exchange in exchanges:
         base = Currency.objects.get(symbol=currency_pair['base'],exchange=exchange)
         quote = Currency.objects.get(symbol=currency_pair['quote'],exchange=exchange)
         if not CurrencyPair.objects.filter(base=base,quote=quote).exists():
+            if exchange.name == "Poloniex":
+                print("adding poloniex pair")
             new_currency = CurrencyPair()
             new_currency.base = base
             new_currency.quote = quote
+            new_currency.symbol = base.symbol + quote.symbol
             new_currency.save()

@@ -15,13 +15,14 @@ class CurrencyPair(models.Model):
 
     base = models.ForeignKey(Currency, on_delete=models.CASCADE,related_name="base")
     quote = models.ForeignKey(Currency, on_delete=models.CASCADE,related_name="quote")
+    symbol = models.CharField(max_length=30, default="")
 
-    bid = models.FloatField(default=None, null=True)
-    ask = models.FloatField(default=None, null=True)
-    last = models.FloatField(default=None, null=True)
+    bid = models.FloatField(default=0)
+    ask = models.FloatField(default=0)
+    last = models.FloatField(default=0)
 
-    base_volume = models.FloatField(default=None, null=True)
-    quote_volume = models.FloatField(default=None, null=True)
+    base_volume = models.FloatField(default=0)
+    quote_volume = models.FloatField(default=0)
 
     def get_quote_value(self,quote_currency):  # implement by looking at last price of quote_currency (USD) and calulating holdings
         pass

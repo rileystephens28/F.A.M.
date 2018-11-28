@@ -203,30 +203,28 @@ function init_chart_doughnut() {
 
     if ($('.canvasDoughnut').length) {
 
+        var backgroundColor = [
+            "#9B59B6",
+            "#E74C3C",
+            "#26B99A",
+            "#3498DB"
+        ],
+        hoverBackgroundColor = [
+            "#B370CF",
+            "#E95E4F",
+            "#36CAAB",
+            "#49A9EA"
+        ]
+
         var chart_doughnut_settings = {
             type: 'doughnut',
             tooltipFillColor: "rgba(51, 51, 51, 0.55)",
             data: {
-                labels: [
-                    "Yee",
-                    "Poloniex",
-                    "Coinbase",
-                    "HitBTC",
-                ],
+                labels: labels,
                 datasets: [{
-                    data: [20, 35, 10, 35],
-                    backgroundColor: [
-                        "#9B59B6",
-                        "#E74C3C",
-                        "#26B99A",
-                        "#3498DB"
-                    ],
-                    hoverBackgroundColor: [
-                        "#B370CF",
-                        "#E95E4F",
-                        "#36CAAB",
-                        "#49A9EA"
-                    ]
+                    data: data,
+                    backgroundColor: backgroundColor,
+                    hoverBackgroundColor: hoverBackgroundColor
                 }]
             },
             options: {

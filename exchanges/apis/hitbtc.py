@@ -1,13 +1,19 @@
 import json
 import requests
-from websocket import create_connection
-from exchanges.apis.websocket_utils import WebSocket, StreamingError
-from datetime import datetime
 import inspect
 import six
-imap = map
+import time
+from datetime import datetime
+from threading import Thread
 from urllib.parse import quote
 from urllib.parse import urlparse
+from websocket import create_connection
+from django.db import connection, connections
+from exchanges.models import Exchange
+from currencies.models import Currency, CurrencyPair
+from exchanges.apis.websocket_utils import WebSocket, StreamingError
+
+imap = map
 
 class HitbtcClient:
     """ API Client for the HitBTC REST API.
@@ -154,19 +160,20 @@ class HitbtcWebsocket(WebSocket):
 
     def __init__(self,symbols):
         self.symbols = symbols
-        self.subscribe()
+        self.exchange = Exchange.objects.get(name="HitBTC")
         super().__init__()
+        self.subscribe()
 
     def subscribe(self):
         for symbol in self.symbols:
             data = { "method": "subscribeTicker", "params": { "symbol": symbol.upper() }, "id": symbol.upper() }
-            self.socket.send(dumps(data))
+            self.socket.send(json.dumps(data))
 
     def start(self):
         while True:
             result = self.socket.recv()
             try:
-                result = loads(result)
+                result = json.loads(result)
                 if 'params' in result.keys():
                     t = Thread(target=self.process_ticker,args=[result])
                     t.daemon = True
@@ -174,10 +181,17 @@ class HitbtcWebsocket(WebSocket):
             except json.decoder.JSONDecodeError: # This means nothing was received for json to decode
                 StreamingError()
                 self.reconnect()
+            time.sleep(.3)
 
     def process_ticker(self,msg):
-        price = json_result['params']['last']
-        print(price)
+        bid = float("%.2f"%float(msg['params']['bid']))
+        ask = float("%.2f"%float(msg['params']['ask']))
+        last = float("%.2f"%float(msg['params']['last']))
+        base_volume = float("%.2f"%float(msg['params']['volume']))
+        quote_volume = float("%.2f"%float(msg['params']['volumeQuote']))
+        CurrencyPair.objects.filter(symbol=msg['params']['symbol'],base__exchange=self.exchange).update(bid=bid,ask=ask,last=last,base_volume=base_volume,quote_volume=quote_volume)
+        connection.close()
+        print("hitbtc  ", msg['params']['symbol'], last)
 
 
 

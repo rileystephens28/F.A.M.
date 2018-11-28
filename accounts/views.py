@@ -45,10 +45,46 @@ def logout_view(request):
 @login_required(login_url="/account/login/")
 def dashboard_view(request):
     user = User.objects.get(email=request.user.email)
-    Thread(target=user.profile.total_balance).start()
-    balances = list(Balance.objects.filter(user=user).order_by('-amount'))[:5]
-    print(balances)
-    return render(request, 'accounts/dashboard.html',{'balances':balances})
+    # Thread(target=user.profile.total_balance).start()
+    # user.profile.total_balance()
+    # for balance in Balance.objects.filter(user=user):
+    #     balance.get_usd_value()
+    balances = list(Balance.objects.filter(user=user, usd_value__gt=0))
+    usd_values = [item.usd_value for item in balances]
+    total_value = sum(usd_values)
+    symbols = []
+    symbol_balances = []
+
+    exchanges = []
+    exchange_balances = []
+    exchange_percent = []
+
+    for balance in balances:
+        if balance.currency.name not in symbols:
+            symbol_balances.append({"symbol":balance.currency.name,'amount':balance.amount,'usd_value':balance.usd_value,'percent':int((balance.usd_value/total_value)*100)})
+            symbols.append(balance.currency.name)
+        else:
+            index = next((index for (index, d) in enumerate(symbol_balances) if d["symbol"] == balance.currency.name), None)
+            symbol_balances[index]['amount'] += balance.amount
+            symbol_balances[index]['usd_value'] += balance.usd_value
+            symbol_balances[index]['percent'] = int((symbol_balances[index]['usd_value']/total_value)*100)
+
+        if balance.currency.exchange.name not in exchanges:
+            exchanges.append(balance.currency.exchange.name)
+            exchange_balances.append(balance.usd_value)
+            exchange_percent.append(int((balance.usd_value/total_value)*100))
+
+        else:
+            index = exchanges.index(balance.currency.exchange.name)
+            exchange_balances[index] += balance.usd_value
+            exchange_percent[index] = int((exchange_balances[index]/total_value)*100)
+
+
+
+
+    symbol_balances = sorted(symbol_balances, key=lambda k: -k['percent'])
+    print(exchanges)
+    return render(request, 'accounts/dashboard.html',{'balances':symbol_balances,'exchanges':exchanges,'exchange_balances':exchange_balances,'exchange_percent':exchange_percent,'total':total_value})
 
 @login_required(login_url="/account/login/")
 def profile_view(request):
