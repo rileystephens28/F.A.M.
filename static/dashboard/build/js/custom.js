@@ -235,9 +235,9 @@ function init_chart_line() {
         var lineChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ["January", "February", "March", "April", "May", "June", "July"],
+                labels: ["May", "June", "July", "August", "September", "October", "November"],
                 datasets: [{
-                    label: "My First dataset",
+                    label: "Portfolio Value",
                     backgroundColor: "rgba(38, 185, 154, 0.31)",
                     borderColor: "rgba(38, 185, 154, 0.7)",
                     pointBorderColor: "rgba(38, 185, 154, 0.7)",
@@ -245,7 +245,7 @@ function init_chart_line() {
                     pointHoverBackgroundColor: "#fff",
                     pointHoverBorderColor: "rgba(220,220,220,1)",
                     pointBorderWidth: 1,
-                    data: [35, 74, 6, 90, 20, 85, 28]
+                    data: [1000, 850, 932, 870, 726, 572, 650]
                 },]
             },
         });

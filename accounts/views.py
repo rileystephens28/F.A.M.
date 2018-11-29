@@ -6,12 +6,14 @@ from django.contrib.auth import login,logout,authenticate
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.db.models import F
-from .models import User, Profile, Balance
+from .models import User, Profile, Balance, Trade
 from currencies.models import CurrencyPair
 from .forms import SignupForm, LoginForm, ApiKeyForm
 
+
 def signup_view(request):
-    """ authenticates user if post request, otherwise returns signup.html"""
+    """ Creates and authenticates user if post request, otherwise returns signup.html"""
+
     if request.method == 'POST':
         form = SignupForm(data = request.POST)
         if form.is_valid():
@@ -26,6 +28,8 @@ def signup_view(request):
     return render(request, 'accounts/signup.html', {'form': form})
 
 def login_view(request):
+    """ Authenticates user if post request, otherwise returns signup.html"""
+
     if request.method == "POST":
         form = LoginForm(data=request.POST)
         if form.is_valid():
@@ -40,14 +44,17 @@ def login_view(request):
 
 @login_required(login_url="/account/login/")
 def logout_view(request):
+    """ Logs user out of account """
+
     logout(request)
     return redirect('home')
 
 @login_required(login_url="/account/login/")
 def dashboard_view(request):
+    """ displays dashboard page for logged in user"""
+
     user = User.objects.get(email=request.user.email)
     # Thread(target=user.profile.total_balance).start()
-    # user.profile.total_balance()
 
     balances = list(Balance.objects.filter(user=user, usd_value__gt=1))
     usd_values = [item.usd_value for item in balances]
@@ -82,41 +89,23 @@ def dashboard_view(request):
     symbol_balances = sorted(symbol_balances, key=lambda k: -k['usd_value'])
     symbols = [{'symbol':item.symbol,"price":item.get_usd_value(),'exchange':item.exchange.name} for item in symbols]
 
+    # trades = Trade.objects.filter(user=user,currency_pair__base__exchange__name="Binance")
+    # user.profile.generate_pl_sheet()
+
+
     return render(request, 'accounts/dashboard.html',{'balances':symbol_balances,'symbols':symbols,'exchange_balances':exchange_balances,'total':total_value})
 
 @login_required(login_url="/account/login/")
 def tax_view(request):
-    # user = User.objects.get(email=request.user.email)
-    # if request.method == "POST":
-    #     form = ApiKeyForm(data=request.POST)
-    #     if form.is_valid():
-    #         exchange = str(form.cleaned_data.get('exchange'))
-    #         api_key = str(form.cleaned_data.get('api_key'))
-    #         secret_key = str(form.cleaned_data.get('secret_key'))
-    #         if exchange == "Binance":
-    #             user.profile.binance_api_key = api_key
-    #             user.profile.binance_secret_key = secret_key
-    #         elif exchange == "Poloniex":
-    #             user.profile.poloniex_api_key = api_key
-    #             user.profile.poloniex_secret_key = secret_key
-    #         elif exchange == "Coinbase":
-    #             user.profile.coinbase_api_key = api_key
-    #             user.profile.coinbase_secret_key = secret_key
-    #         elif exchange == "HitBTC":
-    #             user.profile.hitbtc_api_key = api_key
-    #             user.profile.hitbtc_secret_key = secret_key
-    #         user.profile.save()
-    #         return redirect('profile')
-    #     else:
-    #         form = ApiKeyForm()
-    # else:
-    #     form = ApiKeyForm()
+    """ Displays profit loss sheets to user"""
 
     return render(request, 'accounts/tax_docs.html')
 
 
 @login_required(login_url="/account/login/")
 def profile_view(request):
+    """ Displays profile view and allows user to edit info and add api keys to account"""
+
     user = User.objects.get(email=request.user.email)
     if request.method == "POST":
         form = ApiKeyForm(data=request.POST)

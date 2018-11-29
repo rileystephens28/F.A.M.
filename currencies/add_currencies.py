@@ -11,11 +11,8 @@ from exchanges.models import Exchange
 from currencies.models import Currency, CurrencyPair
 from exchanges.apis.manager import ClientManager
 
-# exchanges = list(Exchange.objects.all())
-exchanges = ["Binance","HitBTC","Poloniex"]
-keys={'binance':{'api_key':'DoISpHGHMG6HsH3q57LmgntGO7TVMYIayzjr2DEaEPaofx4VWbaoVho4W6rwf0e7','secret_key':'DnMYU4nBguMpx2QF6BWgfaAODjJMTFmwNo6oOGcPKbb5x2HjQqBu9m3MnjDBDkBx'},
-      'hitbtc':{'api_key':'25bade92584eb6d27ff04580a6e28d4d','secret_key':'53ba7dc9d5c5937620043c6f447a9db1'},
-      'poloniex':{'api_key':'27V94U3F-VAWLK2EK-PJPRQ9A7-JNC9ZE5S','secret_key':'149c069085f1a32f103b09179d616c6cce67fbba0128e8e529f9500ac83f388cd61a8e82d17e3c824acd36bf1edd30d0a5479a467f810b0baa0bedbac260a212'}}
+""" This script pulls individial cryptocurrencies and currency currency pairs from
+    all exchanges and saves them to DB"""
 
 client = ClientManager(**keys)
 for exchange in exchanges:

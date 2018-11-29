@@ -4,11 +4,15 @@ from django.db import models
 from exchanges.models import Exchange
 
 class Currency(models.Model):
+    """ Indiviual cryptocurrency DB model """
+
     exchange = models.ForeignKey(Exchange, on_delete=models.CASCADE)
     symbol = models.CharField(max_length=10)    # what exchange calls coin
     name = models.CharField(max_length=10)      # what we will can coin (EX: USDT is named USD)
 
     def get_usd_value(self):
+        """ Returns USD price of cryptocurrency that calls this method """
+
         if self.name != "USD":
             if CurrencyPair.objects.filter(symbol=self.symbol+"USDT",base__exchange=self.exchange).exists():
                 pair = CurrencyPair.objects.get(symbol=self.symbol+"USDT",base__exchange=self.exchange)
@@ -39,6 +43,7 @@ class Currency(models.Model):
         return self.symbol
 
 class CurrencyPair(models.Model):
+    """ DB model that represents a currency pair and stores market data"""
 
     base = models.ForeignKey(Currency, on_delete=models.CASCADE,related_name="base")
     quote = models.ForeignKey(Currency, on_delete=models.CASCADE,related_name="quote")

@@ -12,6 +12,8 @@ from currencies.models import Currency, CurrencyPair
 from exchanges.apis.manager import WebSocketMananger
 from accounts.models import Balance
 
+""" Pulls all currencies that user have a balance in and begins streaming them on the exchanges   """
+
 symbols = [item.currency for item in Balance.objects.all() if item.currency.symbol != "USDT" or item.currency.symbol != "USDC"]
 
 stream_symbols = []
@@ -29,13 +31,7 @@ for symbol in symbols:
     elif CurrencyPair.objects.filter(symbol="BTCUSDC",base__exchange=symbol.exchange).exists():
         stream_symbols.append(CurrencyPair.objects.get(symbol="BTCUSDC",base__exchange=symbol.exchange).symbol)
     elif CurrencyPair.objects.filter(symbol="BTCUSD",base__exchange=symbol.exchange).exists():
-        stream_symbols.append(CurrencyPair.objects.get(symbol="BTCUSD",base__exchange=symbol.exchange).symbol)
-
-
-# stream_symbols.append('BTCUSD')
-# stream_symbols.append('BTCUSDC')
-# stream_symbols.append('BTCUSDT')
-# stream_symbols.append('ETHUSD')
+        tream_symbols.append(CurrencyPair.objects.get(symbol="BTCUSD",base__exchange=symbol.exchange).symbol)
 
 stream_symbols = list(set(stream_symbols))
 for sym in stream_symbols:

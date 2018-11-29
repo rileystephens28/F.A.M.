@@ -50,11 +50,15 @@ class BinanceClient:
         self.ping()# init DNS and SSL cert
 
     def get_session(self):
+        """ Creates requests session with proper headers """
+
         session = requests.session()
         session.headers.update({'Accept': 'application/json','User-Agent': 'binance/python','X-MBX-APIKEY': self.API_KEY})
         return session
 
     def get_uri(self, path, signed=True, version=PUBLIC_API_VERSION):
+        """ creates correct uri to request """
+
         if signed:
             v = self.PRIVATE_API_VERSION
         else:
@@ -62,18 +66,25 @@ class BinanceClient:
         return self.API_URL + '/' + v + '/' + path
 
     def _create_withdraw_api_uri(self, path):
+        """ creates correct uri for withdraw requests """
+
         return self.WITHDRAW_API_URL + '/' + self.WITHDRAW_API_VERSION + '/' + path
 
     def get_website_uri(self, path):
+        """ Retreives website uri """
+
         return self.WEBSITE_URL + '/' + path
 
     def get_signature(self, data):
+        """ Creates hash to pass to request """
+
         query_string = urlencode(data)
         m = hmac.new(self.API_SECRET.encode('utf-8'), query_string.encode('utf-8'), hashlib.sha256)
         return m.hexdigest()
 
     def get_order_params(self, data):
         """Convert params to list with signature as last element"""
+
         has_signature = False
         params = []
         for key, value in data.items():
@@ -86,6 +97,8 @@ class BinanceClient:
         return params
 
     def _request(self, method, uri, signed, time_adjust=0, force_params=False, **kwargs):
+        """ makes requests to given uri with given data """
+
         retry_attemps = 0
         while retry_attemps < 20:
             data = kwargs.get('data', None)
@@ -98,8 +111,10 @@ class BinanceClient:
             if data and (method == 'get' or force_params):
                 kwargs['params'] = self.get_order_params(kwargs['data'])
                 temp_data = kwargs['data']
-                del(temp_data["timestamp"])
-                del(temp_data["signature"])
+                if "timestamp" in temp_data.keys():
+                    del(temp_data["timestamp"])
+                if "signature" in temp_data.keys():
+                    del(temp_data["signature"])
                 del(kwargs['data'])
             response = getattr(self.session, method)(uri, **kwargs)
             msg = self._handle_response(response)
@@ -131,14 +146,20 @@ class BinanceClient:
         sys.exit()
 
     def _request_api(self, method, path, signed=False, version=PUBLIC_API_VERSION, **kwargs):
+        """ calls _request with specific params """
+
         uri = self.get_uri(path, signed, version)
         return self._request(method, uri, signed, **kwargs)
 
     def _request_withdraw_api(self, method, path, signed=False, **kwargs):
+        """ calls _request with specific params """
+
         uri = self._create_withdraw_api_uri(path)
         return self._request(method, uri, signed, force_params=True, **kwargs)
 
     def _request_website(self, method, path, signed=False, **kwargs):
+        """ calls _request with specific params """
+
         uri = self.get_website_uri(path)
         return self._request(method, uri, signed, **kwargs)
 
@@ -177,6 +198,7 @@ class BinanceClient:
 
     def get_currencies(self):
         """Return list of products currently listed on Binance"""
+
         currencies = []
         products = self._request_website('get', 'exchange/public/product')
         for currency in products["data"]:
@@ -186,6 +208,7 @@ class BinanceClient:
 
     def get_currency_pairs(self):
         """Return list of products currently listed on Binance"""
+
         currency_pairs = []
         products = self._request_website('get', 'exchange/public/product')
         for product in products["data"]:
@@ -197,8 +220,8 @@ class BinanceClient:
 
     def get_balances(self, **params):
         """Get current asset balance."""
+
         response = self._get('account', True, data=params)
-        # find asset balance in list of balances
         balances = []
         if "balances" in response:
             for balance in response['balances']:
@@ -209,8 +232,28 @@ class BinanceClient:
             return balances
         return None
 
+    def get_historic_trades(self, **params):
+        """ Get history trades for certain time period """
+        return self._get('aggTrades', data=params)
+
+    def get_historic_usd_price(self,base,quote,quantity,time):
+        """ Get price of currency pair at given time """
+
+        quantity = float(quantity)
+        time = int(time)
+        time *= 1000
+        symbol = base+quote
+        trades = self.get_historic_trades(symbol=symbol,startTime=time-500000,endTime=time+500000)
+        try:
+            trade = min(trades, key=lambda x:abs(float(x["q"])-quantity))
+            price = float(trade["p"]) * quantity
+            return price
+        except:
+            print(symbol)
+
     def get_trade_history(self, base, quote,**params):
         """Get trades for a specific symbol."""
+
         orders = []
         symbol = base + quote
         params.update({"symbol":symbol})
@@ -231,6 +274,7 @@ class BinanceClient:
 
     def get_deposit_history(self,asset,**params):
         """Fetch deposit history."""
+
         deposits = []
         params.update({"asset":asset.upper()})
         response = self._request_withdraw_api('get', 'depositHistory.html', True, data=params)
@@ -246,6 +290,7 @@ class BinanceClient:
 
     def get_withdraw_history(self,asset,**params):
         """Fetch withdraw history."""
+
         withdraws = []
         params.update({"asset":asset.upper()})
         response = self._request_withdraw_api('get', 'withdrawHistory.html', True, data=params)
@@ -278,6 +323,7 @@ class BinanceClient:
 #-------------------
 
 class BinanceWebsocket(WebSocket):
+    """ Class to stream live data from Binance """
 
     def __init__(self, symbols):
         symbols = list([item.lower()+"@ticker" for item in symbols])
@@ -288,6 +334,8 @@ class BinanceWebsocket(WebSocket):
         super().__init__()
 
     def start(self):
+        """" Starts listening on websocket  """
+
         while True:
             result = self.socket.recv()
             try:
@@ -301,13 +349,14 @@ class BinanceWebsocket(WebSocket):
                 self.reconnect()
 
     def process_ticker(self,msg):
+        """ Saves market data for currency pair to database   """
+
         bid = float(msg["b"])
         ask = float(msg["a"])
         last = float(msg["c"])
         base_volume = float(msg["v"])
         quote_volume = float(msg["q"])
         CurrencyPair.objects.filter(symbol=msg["s"],base__exchange=self.exchange).update(bid=bid,ask=ask,last=last,base_volume=base_volume,quote_volume=quote_volume)
-        # print("binance  ", msg["s"],last)
 
 
 #-------------------
@@ -387,6 +436,3 @@ class BinanceOrderInactiveSymbolException(BinanceOrderException):
     def __init__(self, value):
         message = "Attempting to trade an inactive symbol %s" % value
         super(BinanceOrderInactiveSymbolException, self).__init__(-1013, message)
-
-# sock = BinanceWebsocket(["ETHBTC"])
-# sock.start()

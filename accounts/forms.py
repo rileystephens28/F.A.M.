@@ -5,6 +5,8 @@ from .models import User, Profile
 from exchanges.models import Exchange
 
 class SignupForm(UserCreationForm):
+    """ Signup form used to create new users"""
+
     first_name = forms.CharField(required=True)
     last_name = forms.CharField(required=True)
     email = forms.EmailField(required=True)
@@ -22,6 +24,8 @@ class SignupForm(UserCreationForm):
         fields = ('first_name', 'last_name','email', 'password1', 'password2')
 
 class LoginForm(AuthenticationForm):
+    """ Login form used to authenticate existsing users"""
+
     username = forms.EmailField(required=True)
 
     def __init__(self, *args, **kwargs):
@@ -35,6 +39,7 @@ class LoginForm(AuthenticationForm):
         fields = ( 'email', 'password')
 
 class ApiKeyForm(forms.Form):
+    """Form located on the profile page that allows users to save api keys to their account"""
 
     exchange= forms.ModelChoiceField(queryset = Exchange.objects.filter().order_by("name"), required=True)
     api_key = forms.CharField(required=True)

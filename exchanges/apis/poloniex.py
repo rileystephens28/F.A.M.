@@ -36,6 +36,7 @@ class PoloniexClient:
 
     def __init__(self, api_key,secret_key,nonce_iter=None,nonce_lock=None):
         """Initialize the Poloniex client."""
+
         self._apikey = api_key
         self._secret = secret_key
         self.session = requests.Session()
@@ -44,6 +45,7 @@ class PoloniexClient:
 
     def _public(self, command, **params):
         """Invoke the 'command' public API with optional params."""
+
         params['command'] = command
         response = self.session.get(self.public_url, params=params)
         try:
@@ -53,6 +55,7 @@ class PoloniexClient:
 
     def _private(self, command, **params):
         """Invoke the 'command' public API with optional params."""
+
         if not self._apikey or not self._secret:
             raise PoloniexCredentialsException('missing apikey/secret')
 
@@ -72,9 +75,12 @@ class PoloniexClient:
 
     def get_currencies(self):
         """Returns information about currencies."""
+
         return list(set(self._public('returnCurrencies').keys()))
 
     def get_currency_pairs(self):
+        """Return list of products currently listed on Poloniex"""
+
         currency_pairs = []
         products = list(self._public('returnTicker').keys())
         for product in products:
@@ -86,11 +92,11 @@ class PoloniexClient:
 
     def get_balance(self,asset):
         """Returns all of your available balances."""
+
         response = self._private('returnBalances')
         asset = asset.upper()
         tradable = float(response[asset])
         return {"asset":asset,"tradable":tradable,"locked":0.0}
-
 
     def get_balances(self):
         """Returns all of your available balances."""
@@ -101,6 +107,22 @@ class PoloniexClient:
             tradable = float(val)
             balances.append({"asset":asset,"tradable":tradable,"locked":0.0})
         return balances
+
+    def get_historic_trades(self,**params):
+        """ Get history trades for certain time period """
+
+        return self._public('returnTradeHistory',**params)
+
+    def get_historic_usd_price(self,base,quote,quantity,time):
+        """ Get price of currency pair at given time """
+
+        quantity = float(quantity)
+        time = int(time)
+        symbol = quote+"_"+base
+        trades = self.get_historic_trades(currencyPair=symbol,start=time-500000,end=time+500000)
+        trade = min(trades, key=lambda x:abs(float(x["amount"])-quantity))
+        price = float(trade["rate"])
+        return price
 
     def get_trade_history(self, base, quote, limit=500):
         """Returns your trade history for a given market, specified by the
@@ -119,9 +141,9 @@ class PoloniexClient:
             id = order["tradeID"]
             price = float(order["rate"])
             amount = float(order["amount"])
-            time = datetime.strptime(order["date"],"%Y-%m-%d %H:%M:%S")
+            order_time = datetime.strptime(order["date"],"%Y-%m-%d %H:%M:%S")
             type = order["type"]
-            orders.append({"symbol":symbol,"id":id,"time":time,"price":price,"amount":amount,"type":type})
+            orders.append({"symbol":symbol,"id":id,"time":order_time,"price":price,"amount":amount,"type":type})
         return orders
 
     def get_deposit_history(self,asset):
@@ -146,6 +168,7 @@ class PoloniexClient:
         """Returns your withdrawal history within a range, specified by the
         "start" and "end" POST parameters, both of which should be given as
         UNIX timestamps."""
+
         start = 0
         end = int(time.time())
         withdraws = []
@@ -167,6 +190,7 @@ class PoloniexClient:
 #-------------------
 
 class PoloniexWebsocket(WebSocket):
+    """ Class to stream live data from Poloniex """
 
     url = "wss://api2.poloniex.com:443"
 
@@ -198,15 +222,14 @@ class PoloniexWebsocket(WebSocket):
         self.subscribe(1002)
 
     def subscribe(self,channel,command="subscribe"):
-        # Can only subscribe to one channel per socket in think
-        """1010:	Heartbeat
-           1002:	Ticker
-           1003:	24 hour Exchange Volume"""
+        """" Subscribe to websocket channel """
 
         data = {"command" : command, "channel" : channel}
         self.socket.send(json.dumps(data))
 
     def start(self):
+        """" Starts listening on websocket  """
+
         while True:
             result = self.socket.recv()
             try:
@@ -221,6 +244,8 @@ class PoloniexWebsocket(WebSocket):
             time.sleep(.3)
 
     def process_response(self,msg):
+        """ Saves market data for currency pair to database   """
+
         symbol = self.currency_codes.get(msg[2][0])
         if symbol:
             base = symbol.split("_")[1]
@@ -235,7 +260,6 @@ class PoloniexWebsocket(WebSocket):
                 quote_volume = float(msg[2][6])
                 CurrencyPair.objects.filter(symbol=currency_pair,base__exchange=self.exchange).update(bid=bid,ask=ask,last=last,base_volume=base_volume,quote_volume=quote_volume)
                 connection.close()
-                # print("poloniex  ", currency_pair, last) # save to database here
 
 
 #-------------------

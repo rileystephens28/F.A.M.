@@ -69,6 +69,8 @@ class HitbtcClient:
 # -----------------------
 
     def get_currencies(self,**params):
+        """Return list of products currently listed on HitBTC"""
+
         currencies = []
         response = self._get('public','currency',params=params)
         products = self._handle_response(response)
@@ -77,6 +79,8 @@ class HitbtcClient:
         return list(set(currencies))
 
     def get_currency_pairs(self,**params):
+        """Return list of products currently listed on HitBTC"""
+
         currency_pairs = []
         response = self._get('public','symbol',params=params)
         products = self._handle_response(response)
@@ -89,6 +93,8 @@ class HitbtcClient:
 
 
     def get_balances(self,**params):
+        """Get current asset balance."""
+
         balances = []
         response = self._get('account','balance',params=params)
         response = self._handle_response(response)
@@ -100,6 +106,8 @@ class HitbtcClient:
         return balances
 
     def get_trade_history(self,base,quote,**params):
+        """Get trades for a specific symbol."""
+
         orders = []
         symbol = base.upper() + quote.upper()
         params.update({"symbol":symbol})
@@ -116,6 +124,8 @@ class HitbtcClient:
         return orders
 
     def get_deposit_history(self,asset,**params):
+        """Fetch deposit history."""
+
         deposits = []
         response = self._get('account','transactions',params=params)
         response = self._handle_response(response)
@@ -131,6 +141,8 @@ class HitbtcClient:
         return deposits
 
     def get_withdraw_history(self,asset,**params):
+        """Fetch withdraw history."""
+
         withdraws = []
         response = self._get('account','transactions',params=params)
         response = self._handle_response(response)
@@ -155,6 +167,7 @@ class HitbtcClient:
 #-------------------
 
 class HitbtcWebsocket(WebSocket):
+    """ Class to stream live data from HitBTC """
 
     url = "wss://api.hitbtc.com/api/2/ws"
 
@@ -165,11 +178,15 @@ class HitbtcWebsocket(WebSocket):
         self.subscribe()
 
     def subscribe(self):
+        """" Subscribes to websocket channel """
+
         for symbol in self.symbols:
             data = { "method": "subscribeTicker", "params": { "symbol": symbol.upper() }, "id": symbol.upper() }
             self.socket.send(json.dumps(data))
 
     def start(self):
+        """" Starts listening on websocket  """
+
         while True:
             result = self.socket.recv()
             try:
@@ -184,6 +201,8 @@ class HitbtcWebsocket(WebSocket):
             time.sleep(.3)
 
     def process_ticker(self,msg):
+        """ Saves market data for currency pair to database   """
+
         bid = float(msg['params']['bid'])
         ask = float(msg['params']['ask'])
         last = float(msg['params']['last'])
@@ -191,7 +210,6 @@ class HitbtcWebsocket(WebSocket):
         quote_volume = float(msg['params']['volumeQuote'])
         CurrencyPair.objects.filter(symbol=msg['params']['symbol'],base__exchange=self.exchange).update(bid=bid,ask=ask,last=last,base_volume=base_volume,quote_volume=quote_volume)
         connection.close()
-        # print("hitbtc  ", msg['params']['symbol'], last)
 
 
 

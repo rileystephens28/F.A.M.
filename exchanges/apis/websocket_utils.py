@@ -28,8 +28,8 @@ class StreamingError:
     def __init__(self,msg):
         self.msg = msg
         print(msg)
-        # self._log()
-        # self._notify()
+        self._log()
+        self._notify()
 
     def _log(self):
         with open("StreamLog","a+") as log:

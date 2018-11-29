@@ -6,7 +6,7 @@ from threading import Thread
 class ClientManager:
 
     def __init__(self, **kwargs):
-        # Need to get api keys and add them as inputs to client modules
+
         if 'poloniex' in kwargs.keys():
             self.poloniex = PoloniexClient(kwargs['poloniex']['api_key'],kwargs['poloniex']['secret_key'])
         if 'hitbtc' in kwargs.keys():
@@ -25,6 +25,10 @@ class ClientManager:
 
     def get_balances(self,exchange):
         exec("x = self."+exchange+".get_balances()")
+        return locals()['x']
+
+    def get_historic_usd_price(self,exchange,base,quote,quantity,time):
+        exec("x = self."+exchange+".get_historic_usd_price('"+base+"','"+quote+"','"+quantity+"','"+time+"')")
         return locals()['x']
 
     def get_trade_history(self,exchange,base,quote):

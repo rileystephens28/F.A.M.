@@ -9,6 +9,7 @@ django.setup()
 from exchanges.models import Exchange
 
 """ Add all cryptocurrency exchanges to CryptoExchange Database """
+
 def add_cryptoExchange(name):
     exchange = Exchange()
     exchange.name = name
