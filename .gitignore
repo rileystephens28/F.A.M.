@@ -1,4 +1,4 @@
 .pyc
 .DS_Store
-db.sqlite3
+.sqlite3
 venv/
