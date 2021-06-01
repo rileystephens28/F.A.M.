@@ -18,7 +18,7 @@ pytz==2018.4
 requests==2.18.4
 six==1.11.0
 traitlets==4.3.2
-urllib3==1.22
+urllib3==1.26.5
 websocket==0.2.1
 websocket-client==0.54.0
 whitenoise==3.3.1
